@@ -1,0 +1,632 @@
+<!doctype html><html lang="vi"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bảng giá thiết bị VTEC — vtec.food</title>
+<meta name="description" content="Bảng giá trọn bộ thiết bị VTEC cho tiệm bánh và nhà máy: máy chà láng, robot viết chữ, máy in thực phẩm, BakeCut, máy pha màu và phần mềm.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/media/logo-trang.webp">
+<!--NOIDUNG--><!--CHEDO-->
+</head><body>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&display=swap">
+<style>
+/* Bố cục: "bảng giá sống" — băng theo nhóm, mục lục dính, nhận diện /v4; mỗi máy = ảnh CẠNH video */
+:root{
+  --muc:#08194A; --dam:#1B3A8B; --cyan:#33A6DC; --vang:#FFC42E;
+  --nen:#F4F6F9; --giay:#FFFFFF; --net:rgba(27,58,139,.18);
+  --chu:#13284F; --chu-mo:rgba(19,40,79,.62);
+  --tit:"Anton","Archivo",system-ui,sans-serif; --than:"Archivo",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{background:var(--nen);color:var(--chu);font-family:var(--than);margin:0;font-size:15px;line-height:1.55}
+h1,h2,h3{font-family:var(--tit);font-weight:400;text-transform:uppercase;letter-spacing:.01em;margin:0;text-wrap:balance}
+.khoi{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.ruot{max-width:1080px;margin:0 auto}
+a{color:var(--dam)}
+.y{display:inline-block;border:1px dashed var(--cyan);color:#0E6FA3;background:rgba(51,166,220,.08);
+  font-size:11.5px;padding:3px 9px;border-radius:999px;margin:6px 0 0;line-height:1.4}
+.ribbon{position:fixed;right:max(10px,env(safe-area-inset-right,0px));bottom:max(10px,env(safe-area-inset-bottom,0px));z-index:50;
+  background:var(--vang);color:#51380A;font-weight:700;font-size:12px;letter-spacing:.12em;text-transform:uppercase;
+  padding:8px 14px;box-shadow:0 8px 24px rgba(8,25,74,.25)}
+.dau{background:linear-gradient(135deg,var(--muc) 0%,var(--dam) 74%,#2b58b8 100%);color:#fff;padding-block:34px 30px}
+.dau .hang{display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:space-between}
+.dau img.logo{height:44px;width:auto}
+.dau h1{font-size:clamp(30px,5.4vw,54px);line-height:1.04;color:#fff}
+.dau .phu{color:rgba(255,255,255,.72)}
+.the-lien-he{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.vien-trang{border:1px solid rgba(255,255,255,.35);padding:8px 14px;font-size:13px;color:#fff;display:inline-flex;gap:8px;align-items:center;background:rgba(238,238,240,.08)}
+.vien-trang b{font-weight:600}
+.kinh-gui{margin-top:18px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.kinh-gui input{background:rgba(255,255,255,.12);border:1px dashed rgba(255,255,255,.4);color:#fff;padding:9px 12px;font:inherit;min-width:min(290px,70vw)}
+.kinh-gui input::placeholder{color:rgba(255,255,255,.55)}
+.muc-luc{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:var(--giay);border-bottom:1px solid var(--net);padding-block:10px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:45;background:var(--giay)}
+.muc-luc .ruot{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chip{font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;
+  border:1px solid var(--net);padding:7px 13px;color:var(--dam);white-space:nowrap}
+.chip:hover{background:var(--dam);color:#fff}
+.muc-luc .cap-nhat{margin-left:auto;font-size:12px;color:var(--chu-mo)}
+.nhom{padding-block:40px 34px}
+.nhom.sam{background:#EBF0F7}
+.nhom-dau{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:20px}
+.nhom-dau h2{font-size:clamp(23px,3.4vw,34px);color:var(--muc)}
+.nhom-dau .dem{font-size:12px;letter-spacing:.2em;color:var(--chu-mo);text-transform:uppercase}
+.bo-the{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(min(430px,100%),1fr))}
+.the{background:var(--giay);border:1px solid var(--net);display:flex;flex-direction:column}
+.media{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--net);border-bottom:1px solid var(--net)}
+.the .anh{position:relative;background:var(--giay)
+  linear-gradient(rgba(27,58,139,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(27,58,139,.07) 1px,transparent 1px);
+  background-size:auto,34px 34px,34px 34px;display:grid;place-items:center;padding:16px;min-height:220px}
+.the .anh img{max-height:200px;width:auto;max-width:100%}
+.vid{position:relative;background:#0B1530;display:grid;place-items:center;overflow:hidden;min-height:220px}
+.vid video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.vid .cho{color:rgba(255,255,255,.75);text-align:center;font-size:12px;padding:10px;display:grid;gap:8px;justify-items:center}
+.vid .cho .nutplay{width:46px;height:46px;border:2px solid rgba(255,255,255,.65);border-radius:999px;display:grid;place-items:center}
+.vid .cho .nutplay::after{content:"";border-style:solid;border-width:8px 0 8px 13px;border-color:transparent transparent transparent #fff;margin-left:3px}
+.vid .tem{position:absolute;left:10px;bottom:8px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#fff;background:rgba(8,25,74,.72);padding:3px 7px}
+@media (max-width:480px){.the .anh,.vid{min-height:150px}.the .anh img{max-height:140px}}
+.badge{position:absolute;left:12px;top:12px;background:var(--muc);color:#fff;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;padding:4px 8px;z-index:2}
+.the .than{padding:18px 20px 20px;display:flex;flex-direction:column;gap:12px;flex:1}
+.the h3{font-size:21px;color:var(--muc)}
+.gia{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.gia .km{font-family:var(--tit);font-size:29px;color:#C01B3C}
+.gia .km.lh{font-size:22px;color:var(--dam)}
+.gia s{color:rgba(19,40,79,.42);font-size:15px}
+.gia .nhan{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--chu-mo)}
+ul.tinh-nang{list-style:none;margin:0;padding:0;display:grid;gap:7px;font-size:14px}
+ul.tinh-nang li{padding-left:22px;position:relative}
+ul.tinh-nang li::before{content:"";position:absolute;left:0;top:4px;width:12px;height:12px;
+  background:var(--cyan);clip-path:polygon(14% 44%,0 60%,40% 100%,100% 16%,84% 2%,40% 70%)}
+.thong-so{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:1px;background:var(--net);border:1px solid var(--net);font-size:12.5px}
+.thong-so div{background:var(--giay);padding:8px 10px}
+.thong-so b{display:block;font-size:13.5px;color:var(--muc)}
+.nut-hang{display:flex;gap:2px;margin-top:auto;flex-wrap:wrap}
+.nut{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:11px 16px;cursor:pointer;border:0;font-family:var(--than)}
+.nut-dam{background:var(--dam);color:#fff}.nut-dam:hover{background:var(--muc)}
+.nut-nhat{background:rgba(27,58,139,.1);color:var(--dam)}.nut-nhat:hover{background:rgba(27,58,139,.2)}
+.so-sanh{margin-top:18px;border:1px solid var(--net);background:var(--giay);overflow-x:auto}
+.so-sanh table{border-collapse:collapse;width:100%;min-width:430px;font-size:13.5px}
+.so-sanh th,.so-sanh td{padding:9px 14px;border-bottom:1px dashed var(--net);text-align:left}
+.so-sanh th{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--chu-mo);font-weight:600}
+.so-sanh td:first-child{color:var(--chu-mo)}
+.so-sanh td{font-variant-numeric:tabular-nums}
+/* thẻ phần mềm */
+.bo-pm{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr))}
+.the.pm{border-top:3px solid var(--cyan)}
+.nhan-pm{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:#0E6FA3;background:rgba(51,166,220,.12);padding:3px 8px;align-self:start}
+.kem{margin-top:auto;font-size:13px;border:1px dashed var(--net);padding:9px 12px;color:var(--chu-mo)}
+.kem b{color:var(--dam)}
+.ung-dung{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.ung-dung figure{margin:0;background:var(--giay);border:1px solid var(--net)}
+.ung-dung img{display:block;width:100%;height:150px;object-fit:cover}
+.ung-dung figcaption{font-size:12px;padding:7px 10px;color:var(--chu-mo)}
+.cam-ket{display:grid;gap:1px;background:var(--net);border:1px solid var(--net);grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.cam-ket div{background:var(--giay);padding:18px}
+.cam-ket b{display:block;color:var(--muc);margin-bottom:4px}
+.khach-lon{background:var(--muc);color:#fff;padding-block:44px}
+.khach-lon h2{color:#fff;font-size:clamp(24px,3.6vw,36px)}
+.khach-lon .hai-cot{display:grid;gap:28px;grid-template-columns:repeat(auto-fit,minmax(min(420px,100%),1fr));margin-top:18px}
+.khach-lon p{color:rgba(255,255,255,.75)}
+.form{display:grid;gap:10px}
+.form input,.form select{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.3);color:#fff;padding:11px 12px;font:inherit}
+.form input::placeholder{color:rgba(255,255,255,.5)}
+.form select{color-scheme:dark}
+.qr{width:92px;height:92px;background:
+  repeating-linear-gradient(0deg,#fff 0 6px,transparent 6px 12px),repeating-linear-gradient(90deg,#fff 0 6px,rgba(255,255,255,.25) 6px 12px);
+  border:4px solid #fff;flex:none}
+.bao{display:none;background:var(--vang);color:#51380A;padding:10px 12px;font-size:13px}
+.chan{background:#060A16;color:rgba(255,255,255,.6);padding-block:30px 10px;overflow:hidden}
+.chan .lien{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:13px}
+.chan .to{font-family:var(--tit);text-transform:uppercase;line-height:.8;color:rgba(255,255,255,.08);
+  font-size:clamp(2rem,11vw,10rem);text-align:center;margin-top:18px;white-space:nowrap}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}.vid video{display:none}}
+@media print{
+  .muc-luc,.nut-hang,.thanh-sua,.nut-media,.vid,.kinh-gui,.form,.qr{display:none!important}
+  .nhom,.dau,.khach-lon{padding-block:14px!important}
+  .the,.goi{break-inside:avoid;border:1px solid #99a}
+  body{background:#fff}
+  .media{grid-template-columns:1fr}
+}
+
+/* ── khu BakeCut: quy trình 5 bước + 3 gói ── */
+.dinh-vi{font-size:16px;max-width:62ch;margin:0 0 6px;color:var(--chu)}
+.dinh-vi b{color:var(--dam)}
+.noi-dau{font-size:13.5px;color:#9B1B33;background:rgba(192,27,60,.07);border:1px dashed rgba(192,27,60,.35);padding:8px 12px;display:inline-block;margin:4px 0 14px}
+.buoc-day{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin:14px 0 4px}
+.buoc{flex:1 0 150px;background:var(--giay);border:1px solid var(--net);padding:12px;position:relative}
+.buoc .so{font-family:var(--tit);font-size:21px;color:#fff;background:var(--dam);width:30px;height:30px;display:grid;place-items:center;margin-bottom:8px}
+.buoc b{display:block;font-size:13.5px;color:var(--muc);text-transform:uppercase;letter-spacing:.04em}
+.buoc span{font-size:12.5px;color:var(--chu-mo)}
+.buoc::after{content:"→";position:absolute;right:-9px;top:14px;color:var(--cyan);font-weight:700;z-index:2}
+.buoc:last-child::after{content:""}
+.usp-day{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 4px}
+.usp{font-size:12px;font-weight:600;border:1px solid var(--net);background:var(--giay);padding:6px 11px;color:var(--dam)}
+.ud-day{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 18px}
+.ud{font-size:12px;background:rgba(51,166,220,.12);color:#0E6FA3;padding:6px 11px;border-radius:999px}
+.bo-goi{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(min(290px,100%),1fr));align-items:stretch}
+.goi{background:var(--giay);border:1px solid var(--net);display:flex;flex-direction:column;position:relative}
+.goi.noi{border:2px solid var(--dam);box-shadow:0 14px 34px rgba(8,25,74,.14)}
+.goi .tem-goi{position:absolute;top:-11px;left:16px;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#fff;background:var(--dam);padding:4px 10px}
+.goi .tem-goi.vang{background:var(--vang);color:#51380A}
+.goi .dau-goi{padding:22px 18px 0}
+.goi h3{font-size:19px}
+.goi .cho-ai{font-size:12.5px;color:var(--chu-mo);margin-top:3px}
+.goi .gia-goi{font-family:var(--tit);font-size:30px;color:#C01B3C;margin-top:8px}
+.goi .anh-goi{display:flex;gap:1px;background:var(--net);border-block:1px solid var(--net);margin-top:14px}
+.goi .anh-goi>div{flex:1;background:#0B1530;display:grid;place-items:center;min-height:132px;padding:8px;position:relative}
+.goi .anh-goi>div.sang{background:var(--giay)}
+.goi .anh-goi img{max-height:116px;width:auto;max-width:100%}
+.goi .anh-goi .cong{position:absolute;right:-8px;top:calc(50% - 10px);z-index:2;background:var(--vang);color:#51380A;width:20px;height:20px;display:grid;place-items:center;font-weight:700;border-radius:999px;font-size:13px}
+.goi ul.tinh-nang{padding:14px 18px 6px}
+.goi .nut-hang{padding:0 18px 18px;margin-top:auto}
+.ghi-anh{font-size:10.5px;color:var(--chu-mo);text-align:center;padding:4px 0 0}
+
+/* ── phần mềm bán riêng ── */
+.tieu-phu{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--chu-mo);margin:22px 0 10px;display:flex;align-items:center;gap:10px}
+.tieu-phu::after{content:"";flex:1;border-top:1px dashed var(--net)}
+.the.pm.ban{border-top:3px solid var(--vang)}
+.tem-pm{position:absolute;right:14px;top:14px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;background:var(--vang);color:#51380A;padding:3px 8px}
+.the.pm{position:relative}
+.gia-pm{font-family:var(--tit);font-size:19px;color:var(--dam)}
+
+/* ── chế độ chỉnh sửa (chỉ chủ trang thấy) ── */
+.thanh-sua{position:fixed;left:max(10px,env(safe-area-inset-left,0px));bottom:max(10px,env(safe-area-inset-bottom,0px));z-index:60;
+  display:none;gap:8px;align-items:center;background:var(--muc);padding:8px;box-shadow:0 10px 30px rgba(8,25,74,.35);flex-wrap:wrap;max-width:min(92vw,560px)}
+.thanh-sua.hien{display:flex}
+.thanh-sua .nut{padding:9px 13px}
+.thanh-sua .tt{color:rgba(255,255,255,.75);font-size:12px}
+body.sua [data-ns]{outline:1.5px dashed var(--cyan);outline-offset:2px;cursor:text;min-height:1em}
+body.sua [data-ns]:focus{outline-style:solid;background:rgba(51,166,220,.08)}
+.nut-media{display:none;position:absolute;left:50%;bottom:8px;transform:translateX(-50%);z-index:5;
+  background:var(--vang);color:#51380A;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:7px 11px;border:0;cursor:pointer;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+body.sua .nut-media{display:block}
+.o-media{position:relative}
+</style>
+
+<header class="dau khoi"><div class="ruot">
+  <div class="hang">
+    <img class="logo" src="/media/logo-trang.webp" alt="VTEC">
+    <div class="phu" style="text-align:right;font-size:13px">Hotline mua hàng<br><b style="color:#fff;font-size:17px">0372 19 39 68</b></div>
+  </div>
+  <h1 style="margin-top:22px" id="tieuDe">Bảng giá thiết bị<br>ngành bánh 2026</h1>
+  <p class="phu" style="max-width:56ch;margin:10px 0 0">Trọn bộ giải pháp VTEC cho tiệm bánh và nhà máy: máy chà láng — robot viết chữ, vẽ hình — máy in thực phẩm — trạm in & cắt — máy pha màu — phần mềm đi kèm.</p>
+  <div class="the-lien-he">
+    <span class="vien-trang">Cập nhật <b id="ngay">30/10/2026</b></span>
+    <span class="vien-trang">Bảo hành <b>12 tháng</b></span>
+    <span class="vien-trang">Kỹ thuật <b>0366 696 008</b></span>
+    <button class="nut nut-dam" style="background:#fff;color:var(--muc)" onclick="window.print()">In / Lưu PDF</button>
+  </div>
+  <div class="kinh-gui">
+    <label for="tenKhach" style="font-size:13px;color:rgba(255,255,255,.72)">Kính gửi:</label>
+    <input id="tenKhach" placeholder="Nhập tên khách để xem bản cá nhân hoá…">
+  </div>
+</div></header>
+
+<nav class="muc-luc khoi"><div class="ruot">
+  <a class="chip" href="#cha-lang">Chà láng</a>
+  <a class="chip" href="#robot">Robot viết chữ</a>
+  <a class="chip" href="#may-in">Máy in</a>
+  <a class="chip" href="#bakecut">BakeCut</a>
+  <a class="chip" href="#pha-mau">Pha màu</a>
+  <a class="chip" href="#phan-mem">Phần mềm</a>
+  <span class="cap-nhat">Thiết bị · gói BakeCut · phần mềm</span>
+</div></nav>
+
+<section class="nhom khoi" id="cha-lang"><div class="ruot">
+  <div class="nhom-dau"><span class="dem">Nhóm 01</span><h2>Máy hỗ trợ chà láng</h2></div>
+  <div class="bo-the"><article class="the">
+      <div class="media">
+        <div class="anh"><span class="badge">Bán chạy</span><img src="/media/vtec-01.webp" alt="Máy chà láng VTEC01"></div>
+        <div class="vid"><div class="cho"><span class="nutplay"></span>Video máy đang chạy<br><b style="color:#fff">đang láng mặt kem</b><span style="opacity:.6">(chờ clip thực tế)</span></div></div>
+      </div>
+      <div class="than">
+        <h3>Máy chà láng — VTEC01</h3>
+        <div class="gia"><span class="km">11.300.000đ</span><s>12.800.000đ</s><span class="nhan">Khuyến mãi</span></div>
+        <ul class="tinh-nang"><li>Láng được bánh đặt trên đế — không cần xúc bánh</li><li>Chọn size bánh một chạm, máy tự hoàn tất</li><li>Hoàn thành bánh dưới 60 giây</li></ul>
+        <div class="thong-so"><div>Màn hình<b>HMI 2.4"</b></div><div>Đế tối đa<b>30°</b></div><div>Bánh tối đa<b>25 cm</b></div><div>Bảo hành<b>12 tháng</b></div></div>
+        <div class="nut-hang"><button class="nut nut-dam">Xem chi tiết</button><button class="nut nut-nhat">Chat Zalo</button></div>
+      </div>
+    </article> <article class="the">
+      <div class="media">
+        <div class="anh"><span class="badge">Bán chạy</span><img src="/media/vtec-02.webp" alt="Máy chà láng VTEC02"></div>
+        <div class="vid"><div class="cho"><span class="nutplay"></span>Video máy đang chạy<br><b style="color:#fff">đang láng mặt kem</b><span style="opacity:.6">(chờ clip thực tế)</span></div></div>
+      </div>
+      <div class="than">
+        <h3>Máy chà láng — VTEC02</h3>
+        <div class="gia"><span class="km">14.300.000đ</span><s>15.800.000đ</s><span class="nhan">Khuyến mãi</span></div>
+        <ul class="tinh-nang"><li>Bản lớn cho tiệm đông đơn và nhà máy</li><li>Màn cảm ứng rộng hơn, thêm chế độ inch</li><li>Hoàn thành bánh dưới 60 giây</li></ul>
+        <div class="thong-so"><div>Màn hình<b>HMI 2.8"</b></div><div>Đế tối đa<b>35°</b></div><div>Bánh tối đa<b>30 cm</b></div><div>Bảo hành<b>12 tháng</b></div></div>
+        <div class="nut-hang"><button class="nut nut-dam">Xem chi tiết</button><button class="nut nut-nhat">Chat Zalo</button></div>
+      </div>
+    </article></div>
+  <div class="so-sanh"><table>
+    <tr><th></th><th>VTEC01</th><th>VTEC02</th></tr>
+    <tr><td>Giá khuyến mãi</td><td><b>11.300.000đ</b></td><td><b>14.300.000đ</b></td></tr>
+    <tr><td>Bánh tối đa</td><td>25 cm</td><td>30 cm</td></tr>
+    <tr><td>Đế nghiêng tối đa</td><td>30°</td><td>35°</td></tr>
+    <tr><td>Phù hợp</td><td>Tiệm vừa và nhỏ</td><td>Tiệm lớn, nhà máy</td></tr>
+  </table></div>
+</div></section>
+
+<section class="nhom sam khoi" id="robot"><div class="ruot">
+  <div class="nhom-dau"><span class="dem">Nhóm 02</span><h2>Robot viết chữ, vẽ hình</h2></div>
+  <div class="bo-the"><article class="the">
+      <div class="media">
+        <div class="anh"><img src="/media/cakew1-trong.webp" alt="Robot CAKEW1"></div>
+        <div class="vid"><div class="cho"><span class="nutplay"></span>Video máy đang chạy<br><b style="color:#fff">đang vẽ hình</b><span style="opacity:.6">(chờ clip thực tế)</span></div></div>
+      </div>
+      <div class="than">
+        <h3>Robot vẽ hình — CAKEW1</h3>
+        <div class="gia"><span class="km">17.500.000đ</span></div>
+        <ul class="tinh-nang"><li>Vẽ hình theo mẫu, logo, chân dung + viết chữ</li><li>Điều khiển trên điện thoại (WiFi), AI gợi ý bố cục</li><li>Hơn 500 font chữ, xilanh 10ml thay nhanh</li></ul>
+        <div class="thong-so"><div>Công dụng<b>Vẽ + viết</b></div><div>Kết nối<b>WiFi</b></div><div>Vật liệu<b>Socola, kem, mực ăn được</b></div><div>Bảo hành<b>12 tháng</b></div></div>
+        <div class="nut-hang"><button class="nut nut-dam">Xem chi tiết</button><button class="nut nut-nhat">Chat Zalo</button></div>
+      </div>
+    </article> <article class="the">
+      <div class="media">
+        <div class="anh"><img src="/media/cakew2-trong.webp" alt="Robot CAKEW2"></div>
+        <div class="vid"><div class="cho"><span class="nutplay"></span>Video máy đang chạy<br><b style="color:#fff">đang viết chữ</b><span style="opacity:.6">(chờ clip thực tế)</span></div></div>
+      </div>
+      <div class="than">
+        <h3>Robot viết chữ — CAKEW2</h3>
+        <div class="gia"><span class="km">25.000.000đ</span></div>
+        <ul class="tinh-nang"><li>Chuyên viết chữ: nét đậm – nhạt như viết tay</li><li>Tốc độ cao, nhiều cỡ chữ, hợp sản lượng lớn</li><li>Điều khiển trên điện thoại, AI gợi ý nội dung</li></ul>
+        <div class="thong-so"><div>Công dụng<b>Chuyên viết chữ</b></div><div>Kết nối<b>WiFi</b></div><div>Font chữ<b>500+</b></div><div>Bảo hành<b>12 tháng</b></div></div>
+        <div class="nut-hang"><button class="nut nut-dam">Xem chi tiết</button><button class="nut nut-nhat">Chat Zalo</button></div>
+      </div>
+    </article></div>
+  <div class="so-sanh"><table>
+    <tr><th></th><th>CAKEW1</th><th>CAKEW2</th></tr>
+    <tr><td>Giá</td><td><b>17.500.000đ</b></td><td><b>25.000.000đ</b></td></tr>
+    <tr><td>Thế mạnh</td><td>Vẽ hình, có viết chữ</td><td>Chuyên viết chữ đậm – nhạt</td></tr>
+    <tr><td>Phù hợp</td><td>Bánh vẽ hình, chân dung</td><td>Sản lượng chữ lớn mỗi ngày</td></tr>
+  </table></div>
+</div></section>
+
+<section class="nhom khoi" id="may-in"><div class="ruot">
+  <div class="nhom-dau"><span class="dem">Nhóm 03</span><h2>Máy in thực phẩm BakePrint</h2></div>
+  <div class="bo-the"><article class="the">
+      <div class="media">
+        <div class="anh"><img src="/media/bakeprint.webp" alt="BakePrint-1"></div>
+        <div class="vid"><video class="bp" autoplay muted loop playsinline></video><span class="tem">Video thật — máy đang in</span></div>
+      </div>
+      <div class="than">
+        <h3>BakePrint-1 · khổ 30×30</h3>
+        <div class="gia"><span class="km">38.500.000đ</span></div>
+        <ul class="tinh-nang"><li>In trực tiếp lên bánh kem, macaron, cookie, socola</li><li>Màn LCD 12.5" điều khiển ngay trên máy</li><li>In độ phân giải cao, dễ thay mực</li></ul>
+        <div class="thong-so"><div>Khổ in<b>30 × 30 cm</b></div><div>Độ cao<b>15 cm</b></div><div>Màn hình<b>LCD 12.5"</b></div><div>Bảo hành<b>12 tháng</b></div></div>
+        <div class="nut-hang"><button class="nut nut-dam">Xem chi tiết</button><button class="nut nut-nhat">Chat Zalo</button></div>
+      </div>
+    </article> <article class="the">
+      <div class="media">
+        <div class="anh"><img src="/media/bakeprint.webp" alt="BakePrint-2"></div>
+        <div class="vid"><video class="bp" autoplay muted loop playsinline></video><span class="tem">Video thật — máy đang in</span></div>
+      </div>
+      <div class="than">
+        <h3>BakePrint-2 · khổ lớn 30×60</h3>
+        <div class="gia"><span class="km">65.500.000đ</span></div>
+        <ul class="tinh-nang"><li>Diện tích in gấp đôi — nhiều bánh một lượt</li><li>Chất lượng in sắc nét, màu chuẩn, bền màu</li><li>Vận hành ổn định cho xưởng sản lượng lớn</li></ul>
+        <div class="thong-so"><div>Khổ in<b>30 × 60 cm</b></div><div>Độ cao<b>20 cm</b></div><div>Màn hình<b>LCD 12.5"</b></div><div>Bảo hành<b>12 tháng</b></div></div>
+        <div class="nut-hang"><button class="nut nut-dam">Xem chi tiết</button><button class="nut nut-nhat">Chat Zalo</button></div>
+      </div>
+    </article></div>
+</div></section>
+
+<section class="nhom sam khoi" id="bakecut"><div class="ruot">
+  <div class="nhom-dau"><span class="dem">Nhóm 04</span><h2>BakeCut — hệ sản xuất đồ trang trí bánh</h2></div>
+  <p class="dinh-vi"><b>Phần mềm + bộ máy chuyên dụng</b> sản xuất <b>sticker, decal, que cắm bánh, tag cắm bánh</b> ngay tại tiệm. Khách gửi hình gì — làm được hình đó: AI nhận diện và tách chi tiết, tạo nguyên bộ cắm giấy, in và cắt tự động. Tất cả thao tác <b>chỉ cần điện thoại</b>.</p>
+  <span class="noi-dau">Hết cảnh từ chối khách vì "không có file, không có mẫu, không biết thiết kế" — mỗi lần từ chối là một đơn mất đi.</span>
+
+  <div class="buoc-day">
+    <div class="buoc"><span class="so">1</span><b>Khách gửi hình</b><span>Chỉ cần một tấm ảnh qua Zalo, Messenger</span></div>
+    <div class="buoc"><span class="so">2</span><b>Chọn mẫu, nhập tên</b><span>BakeCut Studio — AI phân tích, tách chi tiết</span></div>
+    <div class="buoc"><span class="so">3</span><b>In tự động</b><span>In màu sắc nét ra giấy chuyên dụng</span></div>
+    <div class="buoc"><span class="so">4</span><b>Cắt tự động</b><span>Máy cắt chuẩn từng chi tiết</span></div>
+    <div class="buoc"><span class="so">5</span><b>Cắm lên bánh</b><span>Có ngay bộ cắm giấy — giao khách tự tin</span></div>
+  </div>
+
+  <div class="usp-day">
+    <span class="usp">Không cần thiết kế — AI làm giúp</span>
+    <span class="usp">Không cần cắt tay</span>
+    <span class="usp">Không cần máy tính — chỉ cần điện thoại</span>
+    <span class="usp">1–3 phút một bộ</span>
+  </div>
+  <div class="ud-day">
+    <span class="ud">Topper sinh nhật</span><span class="ud">Sticker bánh kem</span><span class="ud">Tag quà tặng</span><span class="ud">Tem hộp bánh</span><span class="ud">Phụ kiện sinh nhật</span>
+  </div>
+
+  <div class="bo-goi">
+    <article class="goi">
+      <div class="dau-goi"><h3>BakeCut Pro</h3><div class="cho-ai">Cho tiệm cần tốc độ và năng suất cao</div><div class="gia-goi">14.500.000đ</div></div>
+      <div class="anh-goi"><div><img src="/media/maycat.webp" alt="Máy cắt BakeCut Pro"></div></div>
+      <ul class="tinh-nang">
+        <li>Máy cắt BakeCut Pro</li><li>Phần mềm BakeCut Studio + Trợ lý Bánh</li>
+        <li>Thư viện mẫu topper Premium</li><li>Thiết kế topper trong 30 giây</li><li>Hỗ trợ cài đặt từ xa</li>
+      </ul>
+      <div class="nut-hang"><button class="nut nut-dam">Tư vấn gói này</button></div>
+    </article>
+    <article class="goi noi">
+      <span class="tem-goi vang">Bán chạy nhất</span>
+      <div class="dau-goi"><h3>Combo BakeCut Pro</h3><div class="cho-ai">Trọn bộ in + cắt — về là chạy</div><div class="gia-goi">20.500.000đ</div></div>
+      <div class="anh-goi">
+        <div><img src="/media/maycat.webp" alt="Máy cắt BakeCut Pro"><span class="cong">+</span></div>
+        <div class="sang"><img src="/media/epson.webp" alt="Máy in màu Epson L3250"></div>
+      </div>
+      <ul class="tinh-nang">
+        <li>Máy cắt BakeCut Pro <b>+ máy in màu Epson L3250</b></li>
+        <li>Phần mềm BakeCut Studio + Trợ lý Bánh</li><li>Thư viện mẫu Premium</li>
+        <li>Hướng dẫn vận hành + hỗ trợ cài đặt</li>
+      </ul>
+      <div class="nut-hang"><button class="nut nut-dam">Tư vấn gói này</button></div>
+    </article>
+    <article class="goi">
+      <span class="tem-goi">Cao cấp</span>
+      <div class="dau-goi"><h3>BakeCut ProMax</h3><div class="cho-ai">Cho xưởng quy mô lớn</div><div class="gia-goi">33.500.000đ</div></div>
+      <div class="anh-goi"><div><img src="/media/maycat.webp" alt="Máy cắt BakeCut ProMax"></div></div>
+      <div class="ghi-anh">Ảnh tạm dùng bản Pro — chờ ảnh ProMax</div>
+      <ul class="tinh-nang">
+        <li>Máy cắt BakeCut ProMax — cắt tự động lên giấy</li>
+        <li>Độ chính xác cực cao, tốc độ vượt trội</li>
+        <li>Phù hợp quy mô lớn</li><li><b>Bảo hành 24 tháng</b></li><li>Hỗ trợ cài đặt từ xa</li>
+      </ul>
+      <div class="nut-hang"><button class="nut nut-dam">Tư vấn gói này</button></div>
+    </article>
+  </div>
+</div></section>
+
+<section class="nhom khoi" id="pha-mau"><div class="ruot">
+  <div class="nhom-dau"><span class="dem">Nhóm 05</span><h2>Máy pha màu tự động</h2></div>
+  <div class="bo-the"><article class="the">
+      <div class="media">
+        <div class="anh"><span class="badge" style="background:var(--vang);color:#51380A">Sắp ra mắt</span><img src="/media/may-pha-mau.webp" alt="Máy pha màu"></div>
+        <div class="vid"><div class="cho"><span class="nutplay"></span>Video máy đang chạy<br><b style="color:#fff">đang pha màu theo công thức</b><span style="opacity:.6">(chờ clip thực tế)</span></div></div>
+      </div>
+      <div class="than">
+        <h3>Máy pha màu tự động</h3>
+        <div class="gia"><span class="km">Liên hệ báo giá</span></div>
+        <ul class="tinh-nang"><li>Pha từ 4 màu cơ bản ra hơn 750 màu chuẩn công thức</li><li>Chọn màu trên điện thoại — máy tự bơm đúng liều</li><li>Đồng nhất màu giữa các mẻ, các chi nhánh</li></ul>
+        
+        <div class="nut-hang"><button class="nut nut-dam">Đăng ký nhận giá sớm</button><button class="nut nut-nhat">Chat Zalo</button></div>
+      </div>
+    </article></div>
+</div></section>
+
+<section class="nhom sam khoi" id="phan-mem"><div class="ruot">
+  <div class="nhom-dau"><span class="dem">Nhóm 06</span><h2>Phần mềm cho tiệm bánh</h2></div>
+
+  <div class="tieu-phu">Bán riêng — tiệm nào cũng dùng được, không cần mua máy</div>
+  <div class="bo-pm" style="grid-template-columns:repeat(auto-fit,minmax(min(380px,100%),1fr))">
+<article class="the pm ban">
+      <span class="tem-pm">Sắp ra mắt</span>
+      <div class="than">
+        <span class="nhan-pm">Phần mềm</span>
+        <h3>In tem & Loa thông báo đơn</h3>
+        <div class="gia-pm">Liên hệ — đăng ký dùng sớm</div>
+        <p style="margin:0;color:var(--chu-mo);font-size:14px">Nhập đơn trên điện thoại — máy tự in tem dán hộp, loa trong bếp đọc to đơn mới. Cả tiệm cùng biết việc, không sót đơn giờ cao điểm.</p>
+        <ul class="tinh-nang"><li>Nhập đơn một màn hình, in tem đơn tự động</li><li>Loa đọc thông báo đơn mới ngay tại bếp</li><li>Đơn giờ nào, cỡ nào, giao đâu — nghe là biết</li></ul>
+        <div class="kem">Trọn bộ: phần mềm + máy in tem + loa thông minh</div>
+      </div>
+    </article><article class="the pm ban">
+      <span class="tem-pm">Đang thử nghiệm</span>
+      <div class="than">
+        <span class="nhan-pm">Phần mềm</span>
+        <h3>Trợ lý Bánh</h3>
+        <div class="gia-pm">Liên hệ — đăng ký dùng sớm</div>
+        <p style="margin:0;color:var(--chu-mo);font-size:14px">Phần mềm quản tiệm bánh gọn nhẹ: ghi đơn nhanh, nhắc đơn tới hẹn, lưu ảnh mẫu theo đơn, nhớ khách quen.</p>
+        <ul class="tinh-nang"><li>Ghi đơn trên điện thoại trong 30 giây</li><li>Nhắc đơn tới hẹn, không quên đơn đặt trước</li><li>Đang chạy thật tại tiệm bánh đối tác</li></ul>
+        <div class="kem">Thuê theo năm — đang hoàn thiện, nhận đăng ký sớm</div>
+      </div>
+    </article>
+  </div>
+
+  <div class="tieu-phu">Đi kèm hệ máy — mua máy là có</div>
+  <div class="bo-pm">
+<article class="the pm">
+      
+      <div class="than">
+        <span class="nhan-pm">Phần mềm</span>
+        <h3>CakeWriter App</h3>
+        
+        <p style="margin:0;color:var(--chu-mo);font-size:14px">Phần mềm viết chữ – vẽ hình trên điện thoại, dùng cho robot CAKEW.</p>
+        <ul class="tinh-nang"><li>Hơn 500 font Việt, kho mẫu theo dịp</li><li>AI gợi ý nội dung, tự căn bố cục</li><li>Quản lý nhiều máy, nhiều chi nhánh một tài khoản</li></ul>
+        <div class="kem">Đi kèm robot CAKEW · cập nhật qua mạng miễn phí</div>
+      </div>
+    </article><article class="the pm">
+      
+      <div class="than">
+        <span class="nhan-pm">Phần mềm</span>
+        <h3>BakePrint Studio</h3>
+        
+        <p style="margin:0;color:var(--chu-mo);font-size:14px">Phần mềm in thực phẩm: từ ảnh khách gửi ra bản in chuẩn màu.</p>
+        <ul class="tinh-nang"><li>Kho mẫu AI, tách nền, tăng nét ảnh</li><li>Hàng đợi in cho tiệm đông đơn</li><li>Hồ sơ màu theo nền bánh (kem, fondant, macaron)</li></ul>
+        <div class="kem">Đi kèm máy BakePrint · cập nhật qua mạng miễn phí</div>
+      </div>
+    </article><article class="the pm">
+      
+      <div class="than">
+        <span class="nhan-pm">Phần mềm</span>
+        <h3>BakeCut Studio</h3>
+        
+        <p style="margin:0;color:var(--chu-mo);font-size:14px">Phần mềm in & cắt: lên khuôn topper, decal và xuất đường cắt.</p>
+        <ul class="tinh-nang"><li>Tự sắp thứ tự cắt tối ưu, lỗ trước viền</li><li>Ghép nhiều mẫu một tấm cho đỡ hao vật liệu</li><li>Đồng bộ mẫu giữa in và cắt, khỏi căn tay</li></ul>
+        <div class="kem">Đi kèm trạm BakeCut · cập nhật qua mạng miễn phí</div>
+      </div>
+    </article>
+  </div>
+</div></section>
+
+<section class="nhom khoi"><div class="ruot">
+  <div class="nhom-dau"><h2 style="font-size:clamp(20px,3vw,28px)">Thành phẩm từ máy VTEC</h2></div>
+  <div class="ung-dung">
+    <figure><img src="/media/thanh-pham-1.webp" alt=""><figcaption>Viết chữ lên bánh kem</figcaption></figure>
+    <figure><img src="/media/thanh-pham-2.webp" alt=""><figcaption>In hình nhân vật</figcaption></figure>
+    <figure><img src="/media/thanh-pham-4.webp" alt=""><figcaption>Bánh sự kiện số lượng lớn</figcaption></figure>
+  </div>
+  <div class="cam-ket" style="margin-top:22px">
+    <div><b>Bảo hành chính hãng 12 tháng</b>Kỹ thuật viên hỗ trợ qua điện thoại, video call và tận nơi.</div>
+    <div><b>Thiết kế & lắp ráp tại Việt Nam</b>Linh kiện thay thế sẵn trong nước, không chờ hàng nhập.</div>
+    <div><b>Đào tạo cầm tay chỉ việc</b>Hướng dẫn 12 bước có video, quét QR trên máy xem ngay.</div>
+    <div><b>Showroom trải nghiệm</b>295 Liên Phường, P. Long Trường, TP. Hồ Chí Minh.</div>
+  </div>
+</div></section>
+
+<section class="khach-lon khoi"><div class="ruot">
+  <h2>Đơn số lượng & đại lý</h2>
+  <div class="hai-cot">
+    <div>
+      <p>Chuỗi tiệm, nhà máy, đơn vị phân phối: VTEC có chính sách giá theo số lượng, lắp đặt nhiều chi nhánh và đào tạo vận hành tại chỗ. Để lại thông tin — đội mua hàng gọi lại trong ngày làm việc.</p>
+      <div style="display:flex;gap:16px;align-items:center;margin-top:16px;flex-wrap:wrap">
+        <div class="qr" role="img" aria-label="Mã QR Zalo OA (minh hoạ)"></div>
+        <div style="font-size:14px">Quét QR → Zalo OA VTEC<br><b style="font-size:18px">0372 19 39 68</b><br><span style="color:rgba(255,255,255,.6)">vtecvn01@gmail.com</span></div>
+      </div>
+    </div>
+    <form class="form" id="formKL">
+      <input id="kl-ten" placeholder="Tên đơn vị / tiệm" required>
+      <input id="kl-sdt" placeholder="Số điện thoại" required inputmode="tel">
+      <select id="kl-nhom"><option>Quan tâm: trọn bộ thiết bị</option><option>Máy chà láng</option><option>Robot viết chữ</option><option>Máy in thực phẩm</option><option>Trạm in & cắt BakeCut</option><option>Máy pha màu</option><option>Phần mềm cho tiệm</option></select>
+      <button class="nut nut-dam" style="background:var(--cyan);color:#06243B">Nhận báo giá số lượng</button>
+      <div class="bao" id="baoForm"></div>
+    </form>
+  </div>
+</div></section>
+
+<footer class="chan khoi"><div class="ruot">
+  <div class="lien">
+    <span>Mua hàng <b style="color:#fff">0372 19 39 68</b></span>
+    <span>Kỹ thuật <b style="color:#fff">0366 696 008</b></span>
+    <span>vtecvn01@gmail.com</span><span>vtecvn.com</span>
+    <span>Fanpage · Zalo OA · TikTok @haminhtri0711</span>
+  </div>
+  <div class="to" aria-hidden="true">VTEC AUTOMATION</div>
+</div></footer>
+
+<script>
+const o = document.getElementById('tenKhach');
+try { const q = new URLSearchParams(location.search).get('khach'); if (q) { o.value = q; } } catch(e) {}
+const apKhach = () => {
+  const h = document.getElementById('tieuDe');
+  const ten = o.value.trim().replace(/[<>&]/g,'');
+  h.innerHTML = ten ? ('Báo giá thiết bị<br>kính gửi ' + ten) : 'Bảng giá thiết bị<br>ngành bánh 2026';
+};
+o.addEventListener('input', apKhach); apKhach();
+document.getElementById('formKL').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const bao = document.getElementById('baoForm'); bao.style.display = 'block'; bao.textContent = 'Đang gửi…';
+  try {
+    const r = await fetch('/api/lien-he', { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ ten: document.getElementById('kl-ten').value, sdt: document.getElementById('kl-sdt').value,
+        quanTam: document.getElementById('kl-nhom').value, luc: new Date().toISOString() }) });
+    bao.textContent = r.ok ? 'Đã ghi nhận — VTEC sẽ gọi lại trong ngày làm việc.' : 'Gửi không được, anh/chị gọi thẳng 0372 19 39 68 giúp.';
+  } catch { bao.textContent = 'Gửi không được, anh/chị gọi thẳng 0372 19 39 68 giúp.'; }
+});
+document.getElementById('ngay').textContent = new Date().toLocaleDateString('vi-VN');
+const VID = "/media/clip-bakeprint.mp4";
+document.querySelectorAll("video.bp").forEach(v => { v.src = VID; v.play().catch(()=>{}); });
+
+/* ───────────── BỘ SỬA NỘI DUNG (bản máy chủ) ─────────────
+   /cai-dat: gõ thẳng vào chữ, bấm nút trên ảnh/video để thay bằng tệp của mình.
+   Lưu về máy chủ (/api/noidung, /api/tep); khách mở trang thấy bản đã sửa. */
+(async () => {
+  const CHU = [".dau h1",".dau p.phu",".nhom-dau h2",".dinh-vi",".noi-dau",
+    ".the h3",".gia .km",".gia s",".the .cho-ai",".goi .gia-goi",".gia-pm",
+    "ul.tinh-nang",".thong-so>div",".the.pm p",".kem",".buoc b",".buoc span",
+    ".usp",".ud",".cam-ket div",".ung-dung figcaption",".khach-lon p",".so-sanh td",".so-sanh th",".tem-pm",".badge",".nhan-pm"];
+  CHU.forEach((sel,si)=>document.querySelectorAll(sel).forEach((el,i)=>{
+    if(!el.closest(".thanh-sua") && !el.hasAttribute("data-ns")) el.setAttribute("data-ns", si+":"+i);
+  }));
+  const MEDIA = [[".the .anh img","anh","image/*"],[".anh-goi img","goianh","image/*"],
+                 [".ung-dung img","ud","image/*"],[".vid","vid","video/*,image/*"]];
+  const oMedia = {};
+  MEDIA.forEach(([sel,tien,loai])=>document.querySelectorAll(sel).forEach((el,i)=>{ oMedia[tien+":"+i] = {el, loai}; }));
+
+  const docHoa = (el) => el.matches("ul.tinh-nang,.thong-so>div,.cam-ket div") ? el.innerText : el.textContent;
+  const ghiHoa = (el, v) => {
+    if (el.matches("ul.tinh-nang")) { el.innerHTML=""; v.split("\n").filter(x=>x.trim()).forEach(t=>{const li=document.createElement("li");li.textContent=t;el.append(li);}); }
+    else if (el.matches(".thong-so>div")) { const [l,...r]=v.split("\n"); el.textContent=l||""; const b=document.createElement("b"); b.textContent=(r.join(" ")||""); el.append(b); }
+    else if (el.matches(".cam-ket div")) { const [t,...r]=v.split("\n"); el.innerHTML=""; const b=document.createElement("b"); b.textContent=t||""; el.append(b, document.createTextNode(r.join(" "))); }
+    else el.textContent = v;
+  };
+  const apMedia = (id, m) => {
+    const o = oMedia[id]; if (!o || !m || !m.url) return;
+    if (o.el.matches(".vid")) {
+      o.el.innerHTML = "";
+      if ((m.type||"").startsWith("video")) {
+        const v=document.createElement("video"); v.src=m.url; v.autoplay=true; v.muted=true; v.loop=true; v.playsInline=true;
+        o.el.append(v); v.play().catch(()=>{});
+      } else { const im=document.createElement("img"); im.src=m.url; im.style.cssText="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"; o.el.append(im); }
+      const t=document.createElement("span"); t.className="tem"; t.textContent="Video thật — máy đang chạy"; o.el.append(t);
+    } else o.el.src = m.url;
+  };
+
+  // nội dung đã lưu: máy chủ nhét sẵn vào window.NOIDUNG — áp cho MỌI người xem
+  let luu = window.NOIDUNG || { chu:{}, media:{} };
+  for (const [id,v] of Object.entries(luu.chu||{})) { const el=document.querySelector('[data-ns="'+id+'"]'); if(el) ghiHoa(el, String(v)); }
+  for (const [id,m] of Object.entries(luu.media||{})) apMedia(id, m);
+
+  if (window.CHE_DO !== "sua") return; // trang thường: không có bộ sửa
+
+  const thanh = document.createElement("div"); thanh.className="thanh-sua hien";
+  thanh.innerHTML = '<button class="nut nut-nhat" id="s-bat" style="background:rgba(255,255,255,.14);color:#fff">✎ Chỉnh sửa</button>'+
+    '<button class="nut nut-dam" id="s-luu" style="background:var(--cyan);color:#06243B" hidden>Lưu thay đổi</button>'+
+    '<button class="nut nut-nhat" id="s-goc" style="background:rgba(255,255,255,.14);color:#fff" hidden>Về bản gốc</button>'+
+    '<a class="nut nut-nhat" href="/" style="background:rgba(255,255,255,.14);color:#fff;text-decoration:none">Xem như khách</a>'+
+    '<span class="tt" id="s-tt">Bật để gõ vào chữ, bấm nút trên ảnh để thay</span>';
+  document.body.append(thanh);
+  const $=id=>document.getElementById(id);
+  const tt=(m)=>{$("s-tt").textContent=m;};
+  let dangSua=false, ban=false;
+  const banDoi=()=>{ban=true;$("s-luu").hidden=false;};
+
+  const guiLuu = async () => {
+    const chu={}; document.querySelectorAll("[data-ns]").forEach(el=>{chu[el.dataset.ns]=docHoa(el);});
+    const r = await fetch("/api/noidung",{method:"POST",headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({chu, media: luu.media, luc: Date.now()})});
+    if(!r.ok) throw new Error(await r.text());
+  };
+
+  $("s-bat").onclick=()=>{
+    dangSua=!dangSua; document.body.classList.toggle("sua",dangSua);
+    $("s-bat").textContent=dangSua?"Xong (tắt sửa)":"✎ Chỉnh sửa";
+    $("s-goc").hidden=!dangSua; if(ban)$("s-luu").hidden=!dangSua;
+    document.querySelectorAll("[data-ns]").forEach(el=>{
+      el.contentEditable=dangSua?"plaintext-only":"false";
+      if(dangSua&&!el.dataset.nghe){el.dataset.nghe="1";el.addEventListener("input",banDoi);}
+    });
+    tt(dangSua?"Gõ thẳng vào chữ; sửa xong bấm Lưu":"");
+  };
+  $("s-luu").onclick=async()=>{ tt("Đang lưu…");
+    try{ await guiLuu(); ban=false;$("s-luu").hidden=true; tt("Đã lưu — khách mở trang sẽ thấy bản này"); }
+    catch(e){ tt("Lưu không được: "+e.message); } };
+  $("s-goc").onclick=async()=>{
+    if(!document.body.dataset.chacGoc){document.body.dataset.chacGoc="1";tt("Bấm 'Về bản gốc' lần nữa để xoá hết chỉnh sửa");return;}
+    try{ const r=await fetch("/api/noidung",{method:"DELETE"}); if(!r.ok) throw new Error(await r.text()); location.reload(); }
+    catch(e){ tt("Không xoá được: "+e.message); } };
+
+  const chonTep = document.createElement("input"); chonTep.type="file"; chonTep.hidden=true; document.body.append(chonTep);
+  for (const [id,o] of Object.entries(oMedia)) {
+    const khung = o.el.matches(".vid") ? o.el : o.el.parentElement;
+    khung.classList.add("o-media");
+    const nut=document.createElement("button"); nut.type="button"; nut.className="nut-media";
+    nut.textContent = o.el.matches(".vid") ? "Thêm / thay video" : "Thay ảnh";
+    nut.onclick=(e)=>{e.preventDefault();e.stopPropagation();
+      chonTep.accept=o.loai; chonTep.onchange=async()=>{
+        const f=chonTep.files[0]; chonTep.value=""; if(!f)return;
+        if(f.size>200*1024*1024){tt("Tệp quá 200MB — nén lại giúp anh");return;}
+        nut.textContent="Đang tải…"; nut.disabled=true;
+        try{
+          const r=await fetch("/api/tep?ten="+encodeURIComponent(f.name),{method:"POST",headers:{"Content-Type":f.type||"application/octet-stream"},body:f});
+          if(!r.ok) throw new Error(await r.text());
+          const kq=await r.json();
+          luu.media[id]={url:kq.url, type:f.type};
+          apMedia(id, luu.media[id]);
+          await guiLuu();
+          tt("Đã thay và lưu");
+        }catch(e){ tt("Tải lên không được: "+e.message); }
+        nut.textContent=o.el.matches(".vid")?"Thêm / thay video":"Thay ảnh"; nut.disabled=false;
+      };
+      chonTep.click();
+    };
+    khung.append(nut);
+  }
+})();
+</script>
+</body></html>
