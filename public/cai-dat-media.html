@@ -57,6 +57,22 @@ h2{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#33A6DC;ma
 .mbox .val{font-size:12px;color:rgba(255,255,255,.55);font-family:ui-monospace,monospace}
 .mbox .mnut{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
 .mbox .mnut .nut{padding:11px 16px;font-size:13px}
+/* AI */
+.keyrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:#141414;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 12px;margin-bottom:12px}
+.keyrow .lb{font-size:13px;font-weight:600}
+.keyrow input{flex:1;min-width:170px;background:#0a0a0a;border:1px solid rgba(255,255,255,.2);color:#fff;padding:9px 11px;border-radius:8px;font:inherit;font-size:13px}
+.keyrow .st{font-size:12px;color:rgba(255,255,255,.5)}
+.keyrow .st.co{color:#4ade80}
+.tabs{display:flex;gap:6px;margin:6px 0 12px}
+.tab{flex:1;text-align:center;padding:9px;border-radius:8px;background:rgba(255,255,255,.08);color:#fff;font-weight:600;font-size:13px;cursor:pointer;border:0}
+.tab.on{background:#33A6DC;color:#04202f}
+.mbox textarea{width:100%;background:#0a0a0a;border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:10px;padding:11px;font:inherit;font-size:14px;min-height:82px;resize:vertical}
+.mbox .md b{color:#fff}
+.aprev{margin-top:12px;border:1px solid rgba(255,255,255,.14);border-radius:10px;overflow:hidden;background:#000;min-height:120px;display:grid;place-items:center}
+.aprev img{width:100%;display:block}
+.aprev .cho{color:rgba(255,255,255,.4);font-size:13px;padding:30px;text-align:center}
+.goiy{font-size:11.5px;color:rgba(255,255,255,.45);margin-top:8px;line-height:1.7}
+.goiy b{color:#33A6DC;font-weight:600;cursor:pointer}
 </style>
 </head>
 <body>
@@ -69,7 +85,13 @@ h2{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#33A6DC;ma
     <button class="lnk" data-xp="/1">Trang /1</button>
     <a class="lnk" href="/cai-dat" style="margin-left:auto">← Về cài đặt</a>
   </div>
-  <p class="ghi">Ảnh nén trước (JPG/WebP/PNG). Video MP4 nên dưới ~50MB (tối đa 200MB), hero <b>loop liền mạch, không tiếng</b>. Nút <b>Vị trí</b> để kéo chọn phần ảnh hiện ra trong khung.</p>
+  <p class="ghi">Ảnh nén trước (JPG/WebP/PNG). Video MP4 nên dưới ~50MB (tối đa 200MB), hero <b>loop liền mạch, không tiếng</b>. Nút <b>Vị trí</b> để kéo chọn phần ảnh hiện ra; nút <b>✨ AI</b> để tạo/sửa ảnh bằng AI.</p>
+  <div class="keyrow">
+    <span class="lb">✨ Khoá AI (OpenAI):</span>
+    <input id="aikey" type="password" placeholder="Dán API key sk-… (lưu trên máy chủ, không lộ)" autocomplete="off">
+    <button class="nut" id="aikey-luu">Lưu khoá</button>
+    <span class="st" id="aikey-st">đang kiểm…</span>
+  </div>
 
   <div class="main">
     <div id="ds"></div>
@@ -96,6 +118,26 @@ h2{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#33A6DC;ma
       <button class="nut" id="m-luu">Lưu vị trí</button>
       <button class="nut ghost" id="m-giua">Đặt lại giữa</button>
       <button class="nut ghost" id="m-dong">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- modal AI -->
+<div class="modal" id="amodal">
+  <div class="mbox">
+    <h3 id="a-nhan">✨ AI ảnh</h3>
+    <div class="tabs">
+      <button class="tab on" id="tab-tao">Tạo mới</button>
+      <button class="tab" id="tab-sua">Sửa ảnh này</button>
+    </div>
+    <p class="md" id="a-md">Mô tả ảnh bạn muốn (càng cụ thể càng tốt): chủ thể, bối cảnh, ánh sáng, phong cách.</p>
+    <textarea id="a-mota" placeholder="VD: máy chà láng kem inox hiện đại đang làm phẳng mặt bánh kem trắng, nền bếp bánh sáng, ảnh sản phẩm chuyên nghiệp"></textarea>
+    <div class="goiy" id="a-goiy"></div>
+    <div class="aprev" id="a-prev"><span class="cho">Ảnh AI sẽ hiện ở đây</span></div>
+    <div class="mnut">
+      <button class="nut" id="a-chay">✨ Tạo ảnh</button>
+      <button class="nut" id="a-dung" style="display:none">Dùng ảnh này</button>
+      <button class="nut ghost" id="a-dong">Đóng</button>
     </div>
   </div>
 </div>
@@ -149,6 +191,7 @@ function card(ten, nhan, loai, aspect) {
     '<div class="acts">' +
       '<button class="nut" data-up="'+ten+'" data-loai="'+loai+'">Tải lên</button>' +
       (loai==='image' ? '<button class="nut ghost" data-pos="'+ten+'" data-aspect="'+aspect+'" data-nhan="'+nhan+'">Vị trí</button>' : '') +
+      (loai==='image' ? '<button class="nut ghost" data-ai="'+ten+'" data-aspect="'+aspect+'" data-nhan="'+nhan+'">✨ AI</button>' : '') +
     '</div>';
   ds.appendChild(o);
   kiemTra(ten, loai);
@@ -249,7 +292,80 @@ document.querySelectorAll('[data-xp]').forEach(b=>b.onclick=()=>{
 });
 document.getElementById('rl').onclick=lamTuoiXem;
 
-(async ()=>{ await taiPOS(); render(); })();
+/* ---- AI ảnh ---- */
+const aikeyI=document.getElementById('aikey'), aikeySt=document.getElementById('aikey-st');
+async function taiKey(){ try{ const r=await fetch('/api/ai-key'); const j=await r.json();
+  aikeySt.textContent=j.co?'Đã cài khoá ✓':'Chưa cài khoá'; aikeySt.className='st'+(j.co?' co':''); }catch(e){ aikeySt.textContent=''; } }
+document.getElementById('aikey-luu').onclick=async()=>{
+  const k=aikeyI.value.trim(); aikeySt.textContent='Đang lưu…'; aikeySt.className='st';
+  try{ const r=await fetch('/api/ai-key',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({khoa:k})});
+    const j=await r.json(); aikeyI.value=''; aikeySt.textContent=j.co?'Đã cài khoá ✓':'Đã xoá khoá'; aikeySt.className='st'+(j.co?' co':''); }
+  catch(e){ aikeySt.textContent='Lỗi lưu khoá'; }
+};
+
+const amodal=document.getElementById('amodal'), aMota=document.getElementById('a-mota'),
+      aPrev=document.getElementById('a-prev'), aNhan=document.getElementById('a-nhan'),
+      aMd=document.getElementById('a-md'), aGoiy=document.getElementById('a-goiy'),
+      tabTao=document.getElementById('tab-tao'), tabSua=document.getElementById('tab-sua'),
+      aChay=document.getElementById('a-chay'), aDung=document.getElementById('a-dung');
+let aTen=null, aAspect='1/1', aTab='tao', aB64=null, aFmt='jpeg';
+
+function fmtTheoTen(t){ const e=t.split('.').pop().toLowerCase(); return e==='png'?'png':(e==='webp'?'webp':'jpeg'); }
+function sizeTheoAspect(a){ const [w,h]=a.split('/').map(Number); if(w>h) return '1536x1024'; if(h>w) return '1024x1536'; return '1024x1024'; }
+function datTab(t){ aTab=t; tabTao.classList.toggle('on',t==='tao'); tabSua.classList.toggle('on',t==='sua');
+  aChay.textContent = t==='tao' ? '✨ Tạo ảnh' : '✨ Sửa ảnh';
+  aMd.innerHTML = t==='tao'
+    ? 'Mô tả ảnh bạn muốn (chủ thể, bối cảnh, ánh sáng, phong cách).'
+    : 'Mô tả cách sửa <b>ảnh đang có ở ô này</b>: xoá nền, đổi nền, làm sáng, mở rộng khung…';
+  aMota.placeholder = t==='tao'
+    ? 'VD: máy chà láng kem inox hiện đại làm phẳng mặt bánh kem trắng, nền bếp bánh sáng, ảnh sản phẩm chuyên nghiệp'
+    : 'VD: xoá nền, thay bằng nền studio trắng sạch; làm sáng và nét hơn';
+}
+tabTao.onclick=()=>datTab('tao'); tabSua.onclick=()=>datTab('sua');
+
+function moAI(ten, aspect, nhan){
+  aTen=ten; aAspect=aspect; aFmt=fmtTheoTen(ten); aB64=null;
+  aNhan.textContent='✨ AI ảnh: '+nhan; datTab('tao');
+  aMota.value=''; aPrev.innerHTML='<span class="cho">Ảnh AI sẽ hiện ở đây</span>';
+  aDung.style.display='none'; aChay.disabled=false;
+  aGoiy.innerHTML='Gợi ý nhanh: <b data-g="Ảnh sản phẩm '+nhan.toLowerCase()+' nền studio trắng sạch, ánh sáng mềm, chụp chuyên nghiệp, độ nét cao">điền mẫu</b>';
+  amodal.classList.add('hien');
+}
+aGoiy.addEventListener('click',(e)=>{ const g=e.target.closest('[data-g]'); if(g) aMota.value=g.dataset.g; });
+
+aChay.onclick=async()=>{
+  const mota=aMota.value.trim(); if(!mota){ aMota.focus(); return; }
+  aChay.disabled=true; const cu=aChay.textContent; aChay.textContent='Đang xử lý… (10–40 giây)';
+  aPrev.innerHTML='<span class="cho">AI đang vẽ…</span>'; aDung.style.display='none';
+  const size=sizeTheoAspect(aAspect);
+  try{
+    const url = aTab==='tao' ? '/api/ai-tao' : '/api/ai-sua';
+    const payload = aTab==='tao' ? {mota,size,format:aFmt} : {mota,size,format:aFmt,nguon:aTen};
+    const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const t=await r.text(); let j={}; try{j=JSON.parse(t);}catch{}
+    if(!r.ok || !j.ok) throw new Error(j.loi || t || ('HTTP '+r.status));
+    aB64=j.b64; aFmt=j.fmt||aFmt;
+    aPrev.innerHTML='<img alt="Ảnh AI" src="data:image/'+aFmt+';base64,'+aB64+'">';
+    aDung.style.display='';
+  }catch(err){ aPrev.innerHTML='<span class="cho" style="color:#f87171">Lỗi: '+err.message+'</span>'; }
+  aChay.disabled=false; aChay.textContent=cu;
+};
+aDung.onclick=async()=>{
+  if(!aB64||!aTen) return;
+  aDung.disabled=true; aDung.textContent='Đang lưu…';
+  try{
+    const r=await fetch('/api/tep-b64?ten='+encodeURIComponent(aTen),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({b64:aB64})});
+    const t=await r.text(); let j={}; try{j=JSON.parse(t);}catch{}
+    if(!r.ok || !j.ok) throw new Error(j.loi||t||('HTTP '+r.status));
+    kiemTra(aTen,'image'); lamTuoiXem(); amodal.classList.remove('hien');
+  }catch(err){ alert('Lưu không được: '+err.message); }
+  aDung.disabled=false; aDung.textContent='Dùng ảnh này';
+};
+document.getElementById('a-dong').onclick=()=>amodal.classList.remove('hien');
+amodal.addEventListener('click',(e)=>{if(e.target===amodal)amodal.classList.remove('hien');});
+ds.addEventListener('click',(e)=>{ const a=e.target.closest('[data-ai]'); if(a) moAI(a.dataset.ai,a.dataset.aspect,a.dataset.nhan); });
+
+(async ()=>{ await taiPOS(); render(); taiKey(); })();
 </script>
 </body>
 </html>

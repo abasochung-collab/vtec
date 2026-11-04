@@ -63,6 +63,27 @@ const taiGit = (url, lan = 0) => new Promise((ok, loi) => {
     const ch = []; r.on("data", (c) => ch.push(c)); r.on("end", () => ok(Buffer.concat(ch)));
   }).on("error", loi);
 });
+// Gọi HTTPS tổng quát (POST JSON / multipart tới OpenAI). Trả { status, buf }.
+const goiHTTPS = (urlStr, { method = "GET", headers = {}, body = null } = {}) => new Promise((ok, loi) => {
+  const uu = new URL(urlStr);
+  const r = https.request({ hostname: uu.hostname, path: uu.pathname + uu.search, method, headers, port: 443 }, (rp) => {
+    const ch = []; rp.on("data", (c) => ch.push(c)); rp.on("end", () => ok({ status: rp.statusCode, buf: Buffer.concat(ch) }));
+  });
+  r.on("error", loi);
+  r.setTimeout(180000, () => r.destroy(new Error("API quá lâu (180s)")));
+  if (body) r.write(body);
+  r.end();
+});
+// Khoá AI: ưu tiên du-lieu/ai-key.txt (đặt qua trang quản lý), rồi .env OPENAI_API_KEY
+const docKhoaAI = () => {
+  try { const f = path.join(DL, "ai-key.txt"); if (existsSync(f)) return readFileSync(f, "utf8").trim(); } catch {}
+  return (env.OPENAI_API_KEY || "").trim();
+};
+const slotHopLe = (s) => {
+  const ten = path.basename(String(s || "").replace(/[^\w.\-]+/g, "-"));
+  const duoi = ten.split(".").pop().toLowerCase();
+  return (ten && !ten.startsWith(".") && ["jpg", "jpeg", "png", "webp"].includes(duoi)) ? ten : null;
+};
 // Kho GitHub công khai để tự cập nhật trang (có thể đổi nhánh qua .env GH_NHANH)
 const GH_REPO = "abasochung-collab/vtec";
 // Các trang tĩnh trong public/ được phép tự cập nhật từ GitHub. dau = chuỗi bắt buộc để kiểm hợp lệ.
@@ -139,6 +160,81 @@ http.createServer(async (req, res) => {
         writeFileSync(path.join(DL, "vitri.json"), JSON.stringify(o));
         res.writeHead(200); return res.end("ok");
       }
+    }
+    // ===== AI ảnh (OpenAI gpt-image-1) =====
+    // Khoá AI: GET → đã cài chưa (không trả khoá); POST {khoa} → lưu/xoá
+    if (u.pathname === "/api/ai-key") {
+      if (!coPhien) return tu401();
+      if (req.method === "GET") { res.writeHead(200, { "Content-Type": MIME.json }); return res.end(JSON.stringify({ co: !!docKhoaAI() })); }
+      if (req.method === "POST") {
+        const o = JSON.parse((await docThan(req, 16 * 1024)).toString());
+        const k = String(o.khoa || "").trim();
+        if (!k) { try { unlinkSync(path.join(DL, "ai-key.txt")); } catch {} }
+        else writeFileSync(path.join(DL, "ai-key.txt"), k);
+        res.writeHead(200, { "Content-Type": MIME.json }); return res.end(JSON.stringify({ co: !!k }));
+      }
+    }
+    // Tạo ảnh mới từ mô tả → trả b64 để xem trước (chưa lưu)
+    if (req.method === "POST" && u.pathname === "/api/ai-tao") {
+      if (!coPhien) return tu401();
+      const o = JSON.parse((await docThan(req, 64 * 1024)).toString());
+      const khoa = docKhoaAI();
+      if (!khoa) { res.writeHead(400, { "Content-Type": MIME.json }); return res.end(JSON.stringify({ ok: false, loi: "Chưa cài khoá AI" })); }
+      const size = ["1024x1024", "1536x1024", "1024x1536"].includes(o.size) ? o.size : "1024x1024";
+      const fmt = ["png", "jpeg", "webp"].includes(o.format) ? o.format : "png";
+      const mota = String(o.mota || "").slice(0, 4000);
+      if (!mota.trim()) { res.writeHead(400, { "Content-Type": MIME.json }); return res.end(JSON.stringify({ ok: false, loi: "Thiếu mô tả" })); }
+      const body = JSON.stringify({ model: "gpt-image-1", prompt: mota, size, n: 1, output_format: fmt });
+      const rp = await goiHTTPS("https://api.openai.com/v1/images/generations", { method: "POST",
+        headers: { Authorization: "Bearer " + khoa, "Content-Type": "application/json", "Content-Length": Buffer.byteLength(body) }, body });
+      let j = null; try { j = JSON.parse(rp.buf.toString()); } catch {}
+      if (rp.status !== 200 || !j || !j.data || !j.data[0] || !j.data[0].b64_json) {
+        const loi = (j && j.error && j.error.message) || ("OpenAI lỗi " + rp.status);
+        res.writeHead(502, { "Content-Type": MIME.json }); return res.end(JSON.stringify({ ok: false, loi }));
+      }
+      res.writeHead(200, { "Content-Type": MIME.json }); return res.end(JSON.stringify({ ok: true, b64: j.data[0].b64_json, fmt }));
+    }
+    // Sửa ảnh có sẵn (xoá/đổi nền, mở rộng, nâng nét…) theo mô tả → trả b64 xem trước
+    if (req.method === "POST" && u.pathname === "/api/ai-sua") {
+      if (!coPhien) return tu401();
+      const o = JSON.parse((await docThan(req, 64 * 1024)).toString());
+      const khoa = docKhoaAI();
+      if (!khoa) { res.writeHead(400, { "Content-Type": MIME.json }); return res.end(JSON.stringify({ ok: false, loi: "Chưa cài khoá AI" })); }
+      const nguonTen = path.basename(String(o.nguon || "").replace(/[^\w.\-]+/g, "-"));
+      const nguonPath = [path.join(DL, "media", nguonTen), path.join(GOC, "public", "media", nguonTen)].find(existsSync);
+      if (!nguonTen || !nguonPath) { res.writeHead(400, { "Content-Type": MIME.json }); return res.end(JSON.stringify({ ok: false, loi: "Chưa có ảnh nguồn — tải ảnh lên ô này trước" })); }
+      const size = ["1024x1024", "1536x1024", "1024x1536"].includes(o.size) ? o.size : "1024x1024";
+      const fmt = ["png", "jpeg", "webp"].includes(o.format) ? o.format : "png";
+      const mota = String(o.mota || "").slice(0, 4000);
+      if (!mota.trim()) { res.writeHead(400, { "Content-Type": MIME.json }); return res.end(JSON.stringify({ ok: false, loi: "Thiếu mô tả chỉnh sửa" })); }
+      const anhBuf = readFileSync(nguonPath);
+      const duoi = nguonTen.split(".").pop().toLowerCase();
+      const bd = "----vtec" + randomBytes(10).toString("hex");
+      const fld = (n, v) => Buffer.from(`--${bd}\r\nContent-Disposition: form-data; name="${n}"\r\n\r\n${v}\r\n`);
+      const body = Buffer.concat([
+        fld("model", "gpt-image-1"), fld("prompt", mota), fld("size", size), fld("output_format", fmt),
+        Buffer.from(`--${bd}\r\nContent-Disposition: form-data; name="image"; filename="${nguonTen}"\r\nContent-Type: ${MIME[duoi] || "application/octet-stream"}\r\n\r\n`),
+        anhBuf, Buffer.from("\r\n"), Buffer.from(`--${bd}--\r\n`),
+      ]);
+      const rp = await goiHTTPS("https://api.openai.com/v1/images/edits", { method: "POST",
+        headers: { Authorization: "Bearer " + khoa, "Content-Type": "multipart/form-data; boundary=" + bd, "Content-Length": body.length }, body });
+      let j = null; try { j = JSON.parse(rp.buf.toString()); } catch {}
+      if (rp.status !== 200 || !j || !j.data || !j.data[0] || !j.data[0].b64_json) {
+        const loi = (j && j.error && j.error.message) || ("OpenAI lỗi " + rp.status);
+        res.writeHead(502, { "Content-Type": MIME.json }); return res.end(JSON.stringify({ ok: false, loi }));
+      }
+      res.writeHead(200, { "Content-Type": MIME.json }); return res.end(JSON.stringify({ ok: true, b64: j.data[0].b64_json, fmt }));
+    }
+    // Lưu ảnh base64 (ảnh AI đã xem trước) vào đúng ô
+    if (req.method === "POST" && u.pathname === "/api/tep-b64") {
+      if (!coPhien) return tu401();
+      const slot = slotHopLe(u.searchParams.get("ten"));
+      if (!slot) { res.writeHead(400); return res.end("Tên ô không hợp lệ"); }
+      const o = JSON.parse((await docThan(req, 25 * 1024 * 1024)).toString());
+      const b64 = String(o.b64 || "").replace(/^data:[^,]+,/, "");
+      if (!b64) { res.writeHead(400); return res.end("Thiếu dữ liệu ảnh"); }
+      writeFileSync(path.join(DL, "media", slot), Buffer.from(b64, "base64"));
+      res.writeHead(200, { "Content-Type": MIME.json }); return res.end(JSON.stringify({ ok: true, url: "/media/" + slot }));
     }
     if (req.method === "POST" && u.pathname === "/api/tep") {
       if (!coPhien) return tu401();
