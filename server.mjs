@@ -147,9 +147,9 @@ http.createServer(async (req, res) => {
   const coPhien = phienOk(req.headers.cookie);
   const tu401 = () => { res.writeHead(401, { "Content-Type": "text/plain; charset=utf-8" }); res.end("Chưa đăng nhập /cai-dat"); };
   try {
-    if (req.method === "GET" && u.pathname === "/") { res.writeHead(200, { "Content-Type": MIME.html }); return res.end(trang("xem")); }
+    if (req.method === "GET" && u.pathname === "/") { res.writeHead(200, { "Content-Type": MIME.html, "Cache-Control": "no-store" }); return res.end(trang("xem")); }
     if (req.method === "GET" && u.pathname === "/cai-dat") {
-      res.writeHead(200, { "Content-Type": MIME.html });
+      res.writeHead(200, { "Content-Type": MIME.html, "Cache-Control": "no-store" });
       return res.end(coPhien ? trang("sua") : trangDangNhap(u.searchParams.has("sai")));
     }
     if (req.method === "POST" && u.pathname === "/api/dang-nhap") {
@@ -303,7 +303,7 @@ http.createServer(async (req, res) => {
       const mTrang = u.pathname.match(/^\/([12])\/?$/); // /1, /2 → public/1.html, public/2.html
       if (req.method === "GET" && mTrang) {
         const tep = path.join(GOC, "public", mTrang[1] + ".html");
-        if (existsSync(tep)) { res.writeHead(200, { "Content-Type": MIME.html }); return res.end(readFileSync(tep)); }
+        if (existsSync(tep)) { res.writeHead(200, { "Content-Type": MIME.html, "Cache-Control": "no-store" }); return res.end(readFileSync(tep)); }
         res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" }); return res.end("Chưa có trang này");
       }
     }
@@ -311,7 +311,7 @@ http.createServer(async (req, res) => {
     if (req.method === "GET" && u.pathname === "/cai-dat/media") {
       if (!coPhien) { res.writeHead(303, { Location: "/cai-dat" }); return res.end(); }
       const tep = path.join(GOC, "public", "cai-dat-media.html");
-      if (existsSync(tep)) { res.writeHead(200, { "Content-Type": MIME.html }); return res.end(readFileSync(tep)); }
+      if (existsSync(tep)) { res.writeHead(200, { "Content-Type": MIME.html, "Cache-Control": "no-store" }); return res.end(readFileSync(tep)); }
       res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" }); return res.end("Chưa có trang quản lý media");
     }
     // Tải tệp lên đúng tên (ghi đè ô media cố định của /1, /2). Lưu vào du-lieu/media để /media/<ten> phục vụ.
