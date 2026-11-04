@@ -65,6 +65,11 @@ const taiGit = (url, lan = 0) => new Promise((ok, loi) => {
 });
 // Kho GitHub công khai để tự cập nhật trang (có thể đổi nhánh qua .env GH_NHANH)
 const GH_REPO = "abasochung-collab/vtec";
+// Các trang tĩnh trong public/ được phép tự cập nhật từ GitHub. dau = chuỗi bắt buộc để kiểm hợp lệ.
+const TRANG_CAP_NHAT = [
+  { ten: "trang.html", dau: "<!--NOIDUNG-->" },
+  { ten: "1.html", dau: "<!doctype html" },
+];
 const trang = (cheDo) => {
   let s = readFileSync(path.join(GOC, "public", "trang.html"), "utf8");
   let nd = { chu: {}, media: {} };
@@ -153,19 +158,30 @@ http.createServer(async (req, res) => {
     if (req.method === "POST" && u.pathname === "/api/cap-nhat") {
       if (!coPhien) return tu401();
       const nhanh = env.GH_NHANH || "main";
-      const nguon = "https://raw.githubusercontent.com/" + GH_REPO + "/" + encodeURIComponent(nhanh) + "/public/trang.html";
-      const buf = await taiGit(nguon);
-      const html = buf.toString("utf8");
-      if (buf.length < 2048 || !/<!doctype html/i.test(html) || !html.includes("<!--NOIDUNG-->")) {
-        res.writeHead(400, { "Content-Type": MIME.json });
-        return res.end(JSON.stringify({ ok: false, loi: "Tệp tải về không hợp lệ (thiếu dấu NOIDUNG hoặc quá nhỏ) — chưa thay" }));
+      const kq = [];
+      for (const t of TRANG_CAP_NHAT) {
+        const nguon = "https://raw.githubusercontent.com/" + GH_REPO + "/" + encodeURIComponent(nhanh) + "/public/" + t.ten;
+        try {
+          const buf = await taiGit(nguon);
+          const html = buf.toString("utf8");
+          if (buf.length < 2048 || !/<!doctype html/i.test(html) || (t.dau && !html.includes(t.dau))) {
+            kq.push({ ten: t.ten, ok: false, loi: "tệp không hợp lệ" }); continue;
+          }
+          const dich = path.join(GOC, "public", t.ten);
+          const cu = existsSync(dich) ? statSync(dich).size : 0;
+          try { if (existsSync(dich)) writeFileSync(dich + ".bak", readFileSync(dich)); } catch {}
+          writeFileSync(dich, buf);
+          kq.push({ ten: t.ten, ok: true, cu, moi: buf.length });
+        } catch (e) { kq.push({ ten: t.ten, ok: false, loi: e.message }); }
       }
-      const dich = path.join(GOC, "public", "trang.html");
-      const cu = existsSync(dich) ? statSync(dich).size : 0;
-      try { if (existsSync(dich)) writeFileSync(dich + ".bak", readFileSync(dich)); } catch {}
-      writeFileSync(dich, buf);
-      res.writeHead(200, { "Content-Type": MIME.json });
-      return res.end(JSON.stringify({ ok: true, nhanh, cu, moi: buf.length }));
+      const soOk = kq.filter((x) => x.ok).length;
+      res.writeHead(soOk ? 200 : 502, { "Content-Type": MIME.json });
+      return res.end(JSON.stringify({ ok: soOk > 0, nhanh, soOk, moi: (kq.find((x) => x.ok && x.ten === "trang.html") || {}).moi, ketQua: kq }));
+    }
+    if (req.method === "GET" && (u.pathname === "/1" || u.pathname === "/1/")) {
+      const tep = path.join(GOC, "public", "1.html");
+      if (existsSync(tep)) { res.writeHead(200, { "Content-Type": MIME.html }); return res.end(readFileSync(tep)); }
+      res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" }); return res.end("Chưa có trang /1");
     }
     if (req.method === "GET" && u.pathname.startsWith("/media/")) {
       const ten = path.basename(u.pathname); // chặn ../
