@@ -6,6 +6,7 @@
    /api/*     lưu nội dung, nhận tệp, nhận khách để lại số
    ============================================================================ */
 import http from "node:http";
+import https from "node:https";
 import { createHmac, timingSafeEqual, randomBytes } from "node:crypto";
 import { readFileSync, existsSync, mkdirSync, writeFileSync, createWriteStream, appendFileSync, unlinkSync, createReadStream, statSync } from "node:fs";
 import path from "node:path";
@@ -53,6 +54,17 @@ const docThan = (req, max = 1024 * 1024) => new Promise((ok, loi) => {
   req.on("data", (c) => { n += c.length; if (n > max) { loi(new Error("to-qua")); req.destroy(); } else phan.push(c); });
   req.on("end", () => ok(Buffer.concat(phan))); req.on("error", loi);
 });
+// Tải một tệp qua HTTPS (dùng cho tự cập nhật từ GitHub công khai), theo chuyển hướng.
+const taiGit = (url, lan = 0) => new Promise((ok, loi) => {
+  if (lan > 4) return loi(new Error("Chuyển hướng quá nhiều"));
+  https.get(url, { headers: { "User-Agent": "baogia-vtec-selfupdate" } }, (r) => {
+    if ([301, 302, 307, 308].includes(r.statusCode) && r.headers.location) { r.resume(); return taiGit(r.headers.location, lan + 1).then(ok, loi); }
+    if (r.statusCode !== 200) { r.resume(); return loi(new Error("GitHub trả " + r.statusCode)); }
+    const ch = []; r.on("data", (c) => ch.push(c)); r.on("end", () => ok(Buffer.concat(ch)));
+  }).on("error", loi);
+});
+// Kho GitHub công khai để tự cập nhật trang (có thể đổi nhánh qua .env GH_NHANH)
+const GH_REPO = "abasochung-collab/vtec";
 const trang = (cheDo) => {
   let s = readFileSync(path.join(GOC, "public", "trang.html"), "utf8");
   let nd = { chu: {}, media: {} };
@@ -135,6 +147,25 @@ http.createServer(async (req, res) => {
       if (!coPhien) return tu401();
       res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });
       return res.end(existsSync(path.join(DL, "lien-he.jsonl")) ? readFileSync(path.join(DL, "lien-he.jsonl")) : "(chưa có ai để lại số)");
+    }
+    // Tự cập nhật: VPS tự tải trang.html mới nhất từ GitHub công khai và thay tại chỗ.
+    // Chỉ chủ trang (đã đăng nhập /cai-dat) gọi được. KHÔNG đụng server.mjs để tránh hỏng máy chủ.
+    if (req.method === "POST" && u.pathname === "/api/cap-nhat") {
+      if (!coPhien) return tu401();
+      const nhanh = env.GH_NHANH || "main";
+      const nguon = "https://raw.githubusercontent.com/" + GH_REPO + "/" + encodeURIComponent(nhanh) + "/public/trang.html";
+      const buf = await taiGit(nguon);
+      const html = buf.toString("utf8");
+      if (buf.length < 2048 || !/<!doctype html/i.test(html) || !html.includes("<!--NOIDUNG-->")) {
+        res.writeHead(400, { "Content-Type": MIME.json });
+        return res.end(JSON.stringify({ ok: false, loi: "Tệp tải về không hợp lệ (thiếu dấu NOIDUNG hoặc quá nhỏ) — chưa thay" }));
+      }
+      const dich = path.join(GOC, "public", "trang.html");
+      const cu = existsSync(dich) ? statSync(dich).size : 0;
+      try { if (existsSync(dich)) writeFileSync(dich + ".bak", readFileSync(dich)); } catch {}
+      writeFileSync(dich, buf);
+      res.writeHead(200, { "Content-Type": MIME.json });
+      return res.end(JSON.stringify({ ok: true, nhanh, cu, moi: buf.length }));
     }
     if (req.method === "GET" && u.pathname.startsWith("/media/")) {
       const ten = path.basename(u.pathname); // chặn ../

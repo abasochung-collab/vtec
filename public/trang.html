@@ -890,6 +890,7 @@ document.getElementById('formKL').addEventListener('submit', async (e) => {
   thanh.innerHTML = '<button class="nut nut-nhat" id="s-bat" style="background:rgba(255,255,255,.14);color:#fff">✎ Chỉnh sửa</button>'+
     '<button class="nut nut-cyan" id="s-luu" hidden>Lưu thay đổi</button>'+
     '<button class="nut nut-nhat" id="s-goc" style="background:rgba(255,255,255,.14);color:#fff" hidden>Về bản gốc</button>'+
+    '<button class="nut nut-vang" id="s-ghit">⟳ Lấy bản mới từ GitHub</button>'+
     '<a class="nut nut-nhat" href="/" style="background:rgba(255,255,255,.14);color:#fff;text-decoration:none">Xem như khách</a>'+
     '<span class="tt" id="s-tt">Bật để gõ vào chữ, bấm nút trên ảnh để thay</span>';
   document.body.append(thanh);
@@ -922,6 +923,18 @@ document.getElementById('formKL').addEventListener('submit', async (e) => {
     if(!document.body.dataset.chacGoc){document.body.dataset.chacGoc='1';tt("Bấm 'Về bản gốc' lần nữa để xoá hết chỉnh sửa");return;}
     try{ const r=await fetch('/api/noidung',{method:'DELETE'}); if(!r.ok) throw new Error(await r.text()); location.reload(); }
     catch(e){ tt('Không xoá được: '+e.message); } };
+  // Lấy bản trang mới nhất từ GitHub và đăng thẳng lên site (phone-only, không cần Mac/SSH)
+  $('s-ghit').onclick=async()=>{
+    if(!document.body.dataset.chacGit){document.body.dataset.chacGit='1';tt('Bấm lần nữa để tải bản mới nhất từ GitHub và đăng lên site');return;}
+    document.body.dataset.chacGit=''; tt('Đang tải bản mới từ GitHub…'); $('s-ghit').disabled=true;
+    try{
+      const r=await fetch('/api/cap-nhat',{method:'POST'});
+      const t=await r.text(); let kq={}; try{kq=JSON.parse(t);}catch{}
+      if(!r.ok||!kq.ok) throw new Error(kq.loi||t||('HTTP '+r.status));
+      tt('Đã cập nhật bản mới ('+kq.moi+' byte) — đang tải lại trang…');
+      setTimeout(()=>location.reload(),1000);
+    }catch(e){ tt('Cập nhật không được: '+e.message); $('s-ghit').disabled=false; }
+  };
 
   /* ----- nút thay ảnh/video trên từng ô media ----- */
   const chonTep = document.createElement('input'); chonTep.type='file'; chonTep.hidden=true; document.body.append(chonTep);
