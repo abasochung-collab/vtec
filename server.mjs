@@ -8,7 +8,7 @@
 import http from "node:http";
 import https from "node:https";
 import { createHmac, timingSafeEqual, randomBytes } from "node:crypto";
-import { readFileSync, existsSync, mkdirSync, writeFileSync, createWriteStream, appendFileSync, unlinkSync, createReadStream, statSync } from "node:fs";
+import { readFileSync, existsSync, mkdirSync, writeFileSync, createWriteStream, appendFileSync, unlinkSync, createReadStream, statSync, openSync, readSync, closeSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -45,8 +45,16 @@ const MIME = { html:"text/html; charset=utf-8", webp:"image/webp", jpg:"image/jp
 const guiTep = (res, tep) => {
   const duoi = tep.split(".").pop().toLowerCase();
   const st = statSync(tep);
-  res.writeHead(200, { "Content-Type": MIME[duoi] || "application/octet-stream",
-    "Content-Length": st.size, "Cache-Control": "public, max-age=3600" });
+  let ct = MIME[duoi] || "application/octet-stream";
+  // Nhận diện ảnh theo byte đầu (ảnh AI png lưu vào .jpg vẫn phục vụ đúng kiểu)
+  try {
+    const fd = openSync(tep, "r"); const hd = Buffer.alloc(12); readSync(fd, hd, 0, 12, 0); closeSync(fd);
+    if (hd[0] === 0x89 && hd[1] === 0x50) ct = "image/png";
+    else if (hd[0] === 0xFF && hd[1] === 0xD8) ct = "image/jpeg";
+    else if (hd.slice(0, 4).toString("latin1") === "RIFF" && hd.slice(8, 12).toString("latin1") === "WEBP") ct = "image/webp";
+    else if (hd.slice(0, 3).toString("latin1") === "GIF") ct = "image/gif";
+  } catch {}
+  res.writeHead(200, { "Content-Type": ct, "Content-Length": st.size, "Cache-Control": "public, max-age=3600" });
   createReadStream(tep).pipe(res);
 };
 const docThan = (req, max = 1024 * 1024) => new Promise((ok, loi) => {
@@ -83,6 +91,27 @@ const slotHopLe = (s) => {
   const ten = path.basename(String(s || "").replace(/[^\w.\-]+/g, "-"));
   const duoi = ten.split(".").pop().toLowerCase();
   return (ten && !ten.startsWith(".") && ["jpg", "jpeg", "png", "webp"].includes(duoi)) ? ten : null;
+};
+// ---- Google Gemini (tạo & sửa ảnh) ----
+const GEMINI_MODEL = () => env.GEMINI_MODEL || "gemini-2.5-flash-image";
+const geminiURL = () => "https://generativelanguage.googleapis.com/v1beta/models/" + GEMINI_MODEL() + ":generateContent";
+const tyLeHint = (size) => size === "1536x1024" ? "16:9 (ngang)" : size === "1024x1536" ? "9:16 (dọc)" : "1:1 (vuông)";
+const goiGemini = async (khoa, parts) => {
+  const body = JSON.stringify({ contents: [{ parts }], generationConfig: { responseModalities: ["TEXT", "IMAGE"] } });
+  const rp = await goiHTTPS(geminiURL(), { method: "POST",
+    headers: { "Content-Type": "application/json", "x-goog-api-key": khoa, "Content-Length": Buffer.byteLength(body) }, body });
+  let j = null; try { j = JSON.parse(rp.buf.toString()); } catch {}
+  if (rp.status !== 200) return { ok: false, loi: (j && j.error && j.error.message) || ("Gemini lỗi " + rp.status) };
+  const ps = (j && j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts) || [];
+  const img = ps.find((p) => (p.inlineData && p.inlineData.data) || (p.inline_data && p.inline_data.data));
+  if (!img) {
+    const txt = ps.map((p) => p.text).filter(Boolean).join(" ").slice(0, 300);
+    const block = j && j.promptFeedback && j.promptFeedback.blockReason;
+    return { ok: false, loi: block ? ("Bị chặn: " + block) : (txt || "Gemini không trả ảnh") };
+  }
+  const d = img.inlineData || img.inline_data;
+  const mime = d.mimeType || d.mime_type || "image/png";
+  return { ok: true, b64: d.data, fmt: mime.includes("jpeg") ? "jpeg" : mime.includes("webp") ? "webp" : "png" };
 };
 // Kho GitHub công khai để tự cập nhật trang (có thể đổi nhánh qua .env GH_NHANH)
 const GH_REPO = "abasochung-collab/vtec";
@@ -181,18 +210,11 @@ http.createServer(async (req, res) => {
       const khoa = docKhoaAI();
       if (!khoa) { res.writeHead(400, { "Content-Type": MIME.json }); return res.end(JSON.stringify({ ok: false, loi: "Chưa cài khoá AI" })); }
       const size = ["1024x1024", "1536x1024", "1024x1536"].includes(o.size) ? o.size : "1024x1024";
-      const fmt = ["png", "jpeg", "webp"].includes(o.format) ? o.format : "png";
       const mota = String(o.mota || "").slice(0, 4000);
       if (!mota.trim()) { res.writeHead(400, { "Content-Type": MIME.json }); return res.end(JSON.stringify({ ok: false, loi: "Thiếu mô tả" })); }
-      const body = JSON.stringify({ model: "gpt-image-1", prompt: mota, size, n: 1, output_format: fmt });
-      const rp = await goiHTTPS("https://api.openai.com/v1/images/generations", { method: "POST",
-        headers: { Authorization: "Bearer " + khoa, "Content-Type": "application/json", "Content-Length": Buffer.byteLength(body) }, body });
-      let j = null; try { j = JSON.parse(rp.buf.toString()); } catch {}
-      if (rp.status !== 200 || !j || !j.data || !j.data[0] || !j.data[0].b64_json) {
-        const loi = (j && j.error && j.error.message) || ("OpenAI lỗi " + rp.status);
-        res.writeHead(502, { "Content-Type": MIME.json }); return res.end(JSON.stringify({ ok: false, loi }));
-      }
-      res.writeHead(200, { "Content-Type": MIME.json }); return res.end(JSON.stringify({ ok: true, b64: j.data[0].b64_json, fmt }));
+      const kq = await goiGemini(khoa, [{ text: mota + "\n\nHãy tạo một hình ảnh, tỉ lệ khung " + tyLeHint(size) + "." }]);
+      if (!kq.ok) { res.writeHead(502, { "Content-Type": MIME.json }); return res.end(JSON.stringify({ ok: false, loi: kq.loi })); }
+      res.writeHead(200, { "Content-Type": MIME.json }); return res.end(JSON.stringify({ ok: true, b64: kq.b64, fmt: kq.fmt }));
     }
     // Sửa ảnh có sẵn (xoá/đổi nền, mở rộng, nâng nét…) theo mô tả → trả b64 xem trước
     if (req.method === "POST" && u.pathname === "/api/ai-sua") {
@@ -203,27 +225,14 @@ http.createServer(async (req, res) => {
       const nguonTen = path.basename(String(o.nguon || "").replace(/[^\w.\-]+/g, "-"));
       const nguonPath = [path.join(DL, "media", nguonTen), path.join(GOC, "public", "media", nguonTen)].find(existsSync);
       if (!nguonTen || !nguonPath) { res.writeHead(400, { "Content-Type": MIME.json }); return res.end(JSON.stringify({ ok: false, loi: "Chưa có ảnh nguồn — tải ảnh lên ô này trước" })); }
-      const size = ["1024x1024", "1536x1024", "1024x1536"].includes(o.size) ? o.size : "1024x1024";
-      const fmt = ["png", "jpeg", "webp"].includes(o.format) ? o.format : "png";
       const mota = String(o.mota || "").slice(0, 4000);
       if (!mota.trim()) { res.writeHead(400, { "Content-Type": MIME.json }); return res.end(JSON.stringify({ ok: false, loi: "Thiếu mô tả chỉnh sửa" })); }
       const anhBuf = readFileSync(nguonPath);
       const duoi = nguonTen.split(".").pop().toLowerCase();
-      const bd = "----vtec" + randomBytes(10).toString("hex");
-      const fld = (n, v) => Buffer.from(`--${bd}\r\nContent-Disposition: form-data; name="${n}"\r\n\r\n${v}\r\n`);
-      const body = Buffer.concat([
-        fld("model", "gpt-image-1"), fld("prompt", mota), fld("size", size), fld("output_format", fmt),
-        Buffer.from(`--${bd}\r\nContent-Disposition: form-data; name="image"; filename="${nguonTen}"\r\nContent-Type: ${MIME[duoi] || "application/octet-stream"}\r\n\r\n`),
-        anhBuf, Buffer.from("\r\n"), Buffer.from(`--${bd}--\r\n`),
-      ]);
-      const rp = await goiHTTPS("https://api.openai.com/v1/images/edits", { method: "POST",
-        headers: { Authorization: "Bearer " + khoa, "Content-Type": "multipart/form-data; boundary=" + bd, "Content-Length": body.length }, body });
-      let j = null; try { j = JSON.parse(rp.buf.toString()); } catch {}
-      if (rp.status !== 200 || !j || !j.data || !j.data[0] || !j.data[0].b64_json) {
-        const loi = (j && j.error && j.error.message) || ("OpenAI lỗi " + rp.status);
-        res.writeHead(502, { "Content-Type": MIME.json }); return res.end(JSON.stringify({ ok: false, loi }));
-      }
-      res.writeHead(200, { "Content-Type": MIME.json }); return res.end(JSON.stringify({ ok: true, b64: j.data[0].b64_json, fmt }));
+      const srcMime = (MIME[duoi] || "image/jpeg").split(";")[0];
+      const kq = await goiGemini(khoa, [{ text: mota }, { inlineData: { mimeType: srcMime, data: anhBuf.toString("base64") } }]);
+      if (!kq.ok) { res.writeHead(502, { "Content-Type": MIME.json }); return res.end(JSON.stringify({ ok: false, loi: kq.loi })); }
+      res.writeHead(200, { "Content-Type": MIME.json }); return res.end(JSON.stringify({ ok: true, b64: kq.b64, fmt: kq.fmt }));
     }
     // Lưu ảnh base64 (ảnh AI đã xem trước) vào đúng ô
     if (req.method === "POST" && u.pathname === "/api/tep-b64") {
