@@ -70,6 +70,7 @@ const TRANG_CAP_NHAT = [
   { ten: "trang.html", dau: "<!--NOIDUNG-->" },
   { ten: "1.html", dau: "<!doctype html" },
   { ten: "2.html", dau: "<!doctype html" },
+  { ten: "cai-dat-media.html", dau: "<!doctype html" },
 ];
 const trang = (cheDo) => {
   let s = readFileSync(path.join(GOC, "public", "trang.html"), "utf8");
@@ -186,6 +187,31 @@ http.createServer(async (req, res) => {
         if (existsSync(tep)) { res.writeHead(200, { "Content-Type": MIME.html }); return res.end(readFileSync(tep)); }
         res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" }); return res.end("Chưa có trang này");
       }
+    }
+    // Trang quản lý media cho /1, /2 (chỉ chủ trang đã đăng nhập)
+    if (req.method === "GET" && u.pathname === "/cai-dat/media") {
+      if (!coPhien) { res.writeHead(303, { Location: "/cai-dat" }); return res.end(); }
+      const tep = path.join(GOC, "public", "cai-dat-media.html");
+      if (existsSync(tep)) { res.writeHead(200, { "Content-Type": MIME.html }); return res.end(readFileSync(tep)); }
+      res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" }); return res.end("Chưa có trang quản lý media");
+    }
+    // Tải tệp lên đúng tên (ghi đè ô media cố định của /1, /2). Lưu vào du-lieu/media để /media/<ten> phục vụ.
+    if (req.method === "POST" && u.pathname === "/api/tep-ten") {
+      if (!coPhien) return tu401();
+      const ten = path.basename((u.searchParams.get("ten") || "").replace(/[^\w.\-]+/g, "-"));
+      const duoi = ten.split(".").pop().toLowerCase();
+      if (!ten || ten.startsWith(".") || !["webp", "jpg", "jpeg", "png", "gif", "mp4", "webm", "mov"].includes(duoi)) {
+        res.writeHead(400); return res.end("Tên tệp không hợp lệ");
+      }
+      const dich = path.join(DL, "media", ten);
+      const ghi = createWriteStream(dich);
+      let n = 0, qua = false;
+      req.on("data", (c) => { n += c.length; if (n > 200 * 1024 * 1024 && !qua) { qua = true; ghi.destroy(); req.destroy(); } });
+      req.pipe(ghi);
+      await new Promise((ok, loi) => { ghi.on("finish", ok); ghi.on("error", loi); req.on("error", loi); });
+      if (qua) { try { unlinkSync(dich); } catch {} res.writeHead(413); return res.end("Tệp quá 200MB"); }
+      res.writeHead(200, { "Content-Type": MIME.json });
+      return res.end(JSON.stringify({ ok: true, url: "/media/" + ten }));
     }
     if (req.method === "GET" && u.pathname.startsWith("/media/")) {
       const ten = path.basename(u.pathname); // chặn ../

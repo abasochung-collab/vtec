@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quản lý media — VTEC</title>
+<meta name="robots" content="noindex">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;line-height:1.5;padding:18px;padding-bottom:60px}
+.wrap{max-width:720px;margin:0 auto}
+h1{font-size:22px;font-weight:800;letter-spacing:-.01em}
+.sub{color:rgba(255,255,255,.6);font-size:14px;margin-top:6px}
+.top{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0 22px}
+.lnk{font-size:13px;color:#33A6DC;text-decoration:none;border:1px solid rgba(51,166,220,.5);padding:7px 13px;border-radius:999px}
+h2{font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:#33A6DC;margin:26px 0 12px;font-weight:700}
+.o{display:flex;gap:14px;align-items:center;background:#141414;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;margin-bottom:10px}
+.xem{width:72px;height:72px;flex:none;border-radius:8px;background:#000;border:1px solid rgba(255,255,255,.12);overflow:hidden;display:grid;place-items:center;position:relative}
+.xem img,.xem video{width:100%;height:100%;object-fit:cover}
+.xem .cho{font-size:10px;color:rgba(255,255,255,.4);text-align:center;padding:4px}
+.o .tt{flex:1;min-width:0}
+.o .nhan{font-weight:600;font-size:14.5px}
+.o .ten{font-size:12px;color:rgba(255,255,255,.5);font-family:ui-monospace,monospace;word-break:break-all}
+.o .tr{font-size:12px;margin-top:3px}
+.o .tr.co{color:#4ade80}.o .tr.khong{color:rgba(255,255,255,.4)}.o .tr.loi{color:#f87171}
+.nut{flex:none;background:#33A6DC;color:#04202f;border:0;border-radius:999px;padding:10px 15px;font:inherit;font-weight:700;font-size:13px;cursor:pointer}
+.nut:disabled{opacity:.6}
+.badge{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);background:rgba(255,255,255,.07);padding:3px 7px;border-radius:5px;margin-left:6px}
+.ghi{font-size:12.5px;color:rgba(255,255,255,.5);background:rgba(51,166,220,.08);border:1px dashed rgba(51,166,220,.3);border-radius:10px;padding:11px 13px;margin-bottom:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Quản lý media — trang /1 &amp; /2</h1>
+  <p class="sub">Bấm <b>Tải lên</b> ở mỗi ô để thay ảnh/video. Tệp lên ngay, khách mở trang là thấy — không cần deploy lại.</p>
+  <div class="top">
+    <a class="lnk" href="/1" target="_blank">Mở trang /1 ↗</a>
+    <a class="lnk" href="/2" target="_blank">Mở trang /2 ↗</a>
+    <a class="lnk" href="/cai-dat">← Về cài đặt</a>
+  </div>
+  <p class="ghi">Ảnh nên nén trước (JPG/WebP/PNG). Video MP4, khuyến nghị dưới ~50MB cho tải nhanh (tối đa 200MB). Video hero nên <b>loop liền mạch, không tiếng</b>.</p>
+  <div id="ds"></div>
+</div>
+
+<input type="file" id="chon" hidden>
+
+<script>
+const SLOTS = {
+  "Trang /1 — Máy chà láng VTEC 3.1": [
+    ["hero-chalang-loop.mp4","Video hero (máy chạy)","video"],
+    ["hero-poster.jpg","Ảnh poster hero","image"],
+    ["may-dang-cha.mp4","Video cận cảnh chà","video"],
+    ["cha-poster.jpg","Poster video chà","image"],
+    ["cat-dau-cha.jpg","Ảnh mặt cắt đầu chà","image"],
+    ["can-canh-chinh-day.jpg","Ảnh chỉnh độ dày","image"],
+    ["de-xoay.jpg","Ảnh đế căn tâm","image"],
+    ["inox-304-canclose.jpg","Ảnh chi tiết inox","image"],
+    ["hmi-mockup.png","Mockup màn hình HMI","image"],
+    ["demo-full.mp4","Video demo dài","video"],
+    ["demo-poster.jpg","Poster video demo","image"],
+    ["may-thong-so.jpg","Ảnh máy nền trắng","image"]
+  ],
+  "Trang /2 — Máy vẽ hình VTEC CAKEW": [
+    ["vehinh-hero-loop.mp4","Video hero (robot vẽ)","video"],
+    ["vehinh-hero-poster.jpg","Ảnh poster hero","image"],
+    ["may-dang-ve.mp4","Video cận cảnh vẽ","video"],
+    ["ve-poster.jpg","Poster video vẽ","image"],
+    ["cat-dau-ve.jpg","Ảnh đầu vẽ","image"],
+    ["net-dam-nhat.jpg","Ảnh nét đậm–nhạt","image"],
+    ["xilanh-10ml.jpg","Ảnh xilanh 10ml","image"],
+    ["app-mockup.png","Mockup app điều khiển","image"],
+    ["ve-tren-banh.jpg","Ảnh vẽ trên bánh","image"],
+    ["demo-ve-full.mp4","Video demo dài","video"],
+    ["demo-ve-poster.jpg","Poster video demo","image"],
+    ["cakew-thong-so.jpg","Ảnh máy nền trắng","image"]
+  ]
+};
+
+const chon = document.getElementById('chon');
+const ds = document.getElementById('ds');
+
+function card(ten, nhan, loai) {
+  const o = document.createElement('div'); o.className = 'o';
+  const bust = '?t=' + Date.now();
+  o.innerHTML =
+    '<div class="xem" id="xem-'+ten+'"><span class="cho">đang kiểm…</span></div>' +
+    '<div class="tt"><div class="nhan">'+nhan+'<span class="badge">'+loai+'</span></div>' +
+    '<div class="ten">'+ten+'</div><div class="tr khong" id="tr-'+ten+'">—</div></div>' +
+    '<button class="nut" data-ten="'+ten+'" data-loai="'+loai+'">Tải lên</button>';
+  ds.appendChild(o);
+  kiemTra(ten, loai);
+}
+
+function kiemTra(ten, loai) {
+  const xem = document.getElementById('xem-'+ten);
+  const tr = document.getElementById('tr-'+ten);
+  const url = '/media/'+ten+'?t='+Date.now();
+  if (loai === 'image') {
+    const im = new Image();
+    im.onload = () => { xem.innerHTML=''; im.style.cssText='width:100%;height:100%;object-fit:cover'; xem.appendChild(im); tr.textContent='Đã có'; tr.className='tr co'; };
+    im.onerror = () => { xem.innerHTML='<span class="cho">chưa có</span>'; tr.textContent='Chưa có — dùng placeholder'; tr.className='tr khong'; };
+    im.src = url;
+  } else {
+    fetch(url, { method:'HEAD' }).then(r => {
+      if (r.ok) { xem.innerHTML='<span class="cho" style="color:#4ade80">▶ video</span>'; tr.textContent='Đã có'; tr.className='tr co'; }
+      else { xem.innerHTML='<span class="cho">chưa có</span>'; tr.textContent='Chưa có — ô video để trống'; tr.className='tr khong'; }
+    }).catch(()=>{ xem.innerHTML='<span class="cho">chưa có</span>'; tr.textContent='Chưa có'; tr.className='tr khong'; });
+  }
+}
+
+for (const [nhom, slots] of Object.entries(SLOTS)) {
+  const h = document.createElement('h2'); h.textContent = nhom; ds.appendChild(h);
+  slots.forEach(([ten, nhan, loai]) => card(ten, nhan, loai));
+}
+
+let dangTen = null, dangNut = null, dangLoai = null;
+ds.addEventListener('click', (e) => {
+  const b = e.target.closest('.nut'); if (!b) return;
+  dangTen = b.dataset.ten; dangNut = b; dangLoai = b.dataset.loai;
+  chon.accept = dangLoai === 'video' ? 'video/*' : 'image/*';
+  chon.value = ''; chon.click();
+});
+
+chon.addEventListener('change', async () => {
+  const f = chon.files[0]; if (!f || !dangTen) return;
+  if (f.size > 200*1024*1024) { alert('Tệp quá 200MB, nén lại giúp nhé'); return; }
+  const tr = document.getElementById('tr-'+dangTen);
+  const nut = dangNut, ten = dangTen, loai = dangLoai;
+  nut.disabled = true; nut.textContent = 'Đang tải…';
+  tr.textContent = 'Đang tải lên…'; tr.className = 'tr';
+  try {
+    const r = await fetch('/api/tep-ten?ten='+encodeURIComponent(ten), { method:'POST', headers:{'Content-Type': f.type||'application/octet-stream'}, body:f });
+    const t = await r.text(); let kq={}; try{kq=JSON.parse(t);}catch{}
+    if (!r.ok || !kq.ok) throw new Error(kq.loi || t || ('HTTP '+r.status));
+    tr.textContent = 'Đã tải lên ✓'; tr.className = 'tr co';
+    kiemTra(ten, loai);
+  } catch (err) {
+    tr.textContent = 'Lỗi: ' + err.message; tr.className = 'tr loi';
+  }
+  nut.disabled = false; nut.textContent = 'Tải lên';
+});
+</script>
+</body>
+</html>
