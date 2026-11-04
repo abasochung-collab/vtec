@@ -69,6 +69,7 @@ const GH_REPO = "abasochung-collab/vtec";
 const TRANG_CAP_NHAT = [
   { ten: "trang.html", dau: "<!--NOIDUNG-->" },
   { ten: "1.html", dau: "<!doctype html" },
+  { ten: "2.html", dau: "<!doctype html" },
 ];
 const trang = (cheDo) => {
   let s = readFileSync(path.join(GOC, "public", "trang.html"), "utf8");
@@ -178,10 +179,13 @@ http.createServer(async (req, res) => {
       res.writeHead(soOk ? 200 : 502, { "Content-Type": MIME.json });
       return res.end(JSON.stringify({ ok: soOk > 0, nhanh, soOk, moi: (kq.find((x) => x.ok && x.ten === "trang.html") || {}).moi, ketQua: kq }));
     }
-    if (req.method === "GET" && (u.pathname === "/1" || u.pathname === "/1/")) {
-      const tep = path.join(GOC, "public", "1.html");
-      if (existsSync(tep)) { res.writeHead(200, { "Content-Type": MIME.html }); return res.end(readFileSync(tep)); }
-      res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" }); return res.end("Chưa có trang /1");
+    {
+      const mTrang = u.pathname.match(/^\/([12])\/?$/); // /1, /2 → public/1.html, public/2.html
+      if (req.method === "GET" && mTrang) {
+        const tep = path.join(GOC, "public", mTrang[1] + ".html");
+        if (existsSync(tep)) { res.writeHead(200, { "Content-Type": MIME.html }); return res.end(readFileSync(tep)); }
+        res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" }); return res.end("Chưa có trang này");
+      }
     }
     if (req.method === "GET" && u.pathname.startsWith("/media/")) {
       const ten = path.basename(u.pathname); // chặn ../

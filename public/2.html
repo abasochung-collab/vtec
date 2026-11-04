@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Máy vẽ hình & viết chữ lên bánh VTEC CAKEW — khách gửi hình nào, vẽ hình đó</title>
+<meta name="description" content="Robot vẽ hình, chân dung, logo và viết chữ lên bánh VTEC CAKEW: điều khiển bằng điện thoại, AI gợi ý bố cục, hơn 500 font chữ Việt, vẽ lại chính xác 100%. Nhận mọi đơn bánh khó.">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/media/logo-trang.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;800&display=swap">
+<style>
+/* ============================================================================
+   Máy vẽ hình & viết chữ VTEC CAKEW — landing kiểu Bambu Lab X1.
+   Dùng chung hệ thiết kế với /1: 1 tệp, GSAP + ScrollTrigger (CDN), nền
+   trắng/đen, nhấn cyan #33A6DC. Nội dung HIỆN mặc định; GSAP chỉ tăng cường.
+   ============================================================================ */
+:root{
+  --bg:#ffffff; --ink:#0a0a0a; --den:#0a0a0a;
+  --xam:#f4f5f7; --xam-net:#e6e8ec; --xam-chu:#6b7280;
+  --nhan:#33A6DC; --nhan-dam:#1B8FC9;
+  --den-chu:rgba(255,255,255,.72); --den-net:rgba(255,255,255,.14);
+  --font:"Be Vietnam Pro",system-ui,-apple-system,sans-serif;
+  --max:1160px; --kc:clamp(72px,11vh,130px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);line-height:1.5;overflow-x:hidden;font-size:16px}
+img,video{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+h1,h2,h3{font-weight:800;line-height:1.04;letter-spacing:-.02em;text-wrap:balance}
+.wrap{max-width:var(--max);margin:0 auto;padding-inline:clamp(20px,5vw,40px)}
+.sec{padding-block:var(--kc);position:relative}
+.den{background:var(--den);color:#fff}
+.den h1,.den h2,.den h3{color:#fff}
+.eyebrow{font-size:13px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--nhan);margin-bottom:18px}
+.lead{font-size:clamp(16px,2vw,20px);color:var(--xam-chu);max-width:52ch;margin-top:18px}
+.den .lead{color:var(--den-chu)}
+h2.big{font-size:clamp(32px,6vw,68px)}
+.nut{display:inline-flex;align-items:center;gap:9px;font:inherit;font-weight:600;font-size:15px;padding:15px 26px;border-radius:999px;cursor:pointer;border:1.5px solid transparent;transition:transform .2s,background .2s,border-color .2s,color .2s}
+.nut:active{transform:translateY(1px)}
+.nut-chinh{background:var(--nhan);color:#04202f}.nut-chinh:hover{background:var(--nhan-dam);color:#fff}
+.nut-phu{background:transparent;border-color:rgba(255,255,255,.4);color:#fff}.nut-phu:hover{background:rgba(255,255,255,.1)}
+.hang-nut{display:flex;gap:14px;flex-wrap:wrap;margin-top:34px}
+.ph{position:relative;background:#111418;border:1px solid var(--den-net);display:grid;place-items:center;overflow:hidden;border-radius:14px}
+.den .ph{background:#15181d}
+.ph video,.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ph .nhan-ph{position:relative;z-index:1;color:rgba(255,255,255,.4);font-size:12.5px;letter-spacing:.08em;text-align:center;padding:14px;font-weight:500}
+.ph .nhan-ph b{color:rgba(255,255,255,.65);display:block;font-weight:600;margin-top:4px}
+.gsap-on .reveal{opacity:0}
+
+/* HERO */
+.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;padding-block:120px 40px}
+.hero .ph.bg{position:absolute;inset:0;border:0;border-radius:0;z-index:0}
+.hero .ph.bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,10,.55),rgba(10,10,10,.82))}
+.hero .wrap{position:relative;z-index:2}
+.hero .logo{height:30px;margin-bottom:34px;opacity:.95}
+.hero h1{font-size:clamp(42px,8.4vw,98px);line-height:.98}
+.hero h1 .ten{display:block;color:#fff}
+.hero h1 .tag{display:block;color:var(--nhan);font-size:clamp(22px,4.2vw,44px);margin-top:10px}
+.hero .sub{color:var(--den-chu);font-size:clamp(16px,2vw,20px);max-width:48ch;margin-top:24px}
+.cuon{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);z-index:2;color:rgba(255,255,255,.6);font-size:11px;letter-spacing:.2em;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:8px}
+.cuon::after{content:"";width:1px;height:30px;background:linear-gradient(rgba(255,255,255,.7),transparent);animation:cuonAn 1.8s ease-in-out infinite}
+@keyframes cuonAn{0%,100%{opacity:.4;transform:scaleY(.6)}50%{opacity:1;transform:scaleY(1)}}
+
+.so-day{background:var(--den);color:#fff;border-top:1px solid var(--den-net)}
+.so-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--den-net)}
+.so-o{background:var(--den);padding:clamp(28px,5vw,52px) 20px;text-align:center}
+.so-o .num{font-size:clamp(44px,8vw,86px);font-weight:800;letter-spacing:-.03em;line-height:1;color:#fff}
+.so-o .num .dem{color:var(--nhan)}
+.so-o .nhan-so{margin-top:10px;color:var(--den-chu);font-size:14px}
+@media (max-width:700px){.so-grid{grid-template-columns:1fr}}
+
+/* SECTION 2 — năng lực */
+.speed{min-height:100svh;display:flex;align-items:center;overflow:hidden}
+.speed .wrap{width:100%}
+.speed-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(30px,5vw,60px);align-items:center}
+@media (max-width:900px){.speed-grid{grid-template-columns:1fr}}
+.speed .huge{font-size:clamp(100px,22vw,300px);font-weight:800;line-height:.8;letter-spacing:-.05em;color:#fff}
+.speed .huge span{color:var(--nhan);font-size:.32em;vertical-align:super}
+.speed .moc{margin-top:22px;display:grid;gap:14px;max-width:42ch}
+.speed .moc .m{display:flex;gap:14px;align-items:baseline;color:var(--den-chu);font-size:clamp(15px,1.8vw,18px)}
+.speed .moc .m b{color:#fff;font-weight:600;min-width:98px}
+.speed .vs{display:inline-block;margin-top:8px;padding:7px 14px;border:1px dashed rgba(255,255,255,.3);border-radius:999px;color:rgba(255,255,255,.7);font-size:13px}
+.speed .ph{aspect-ratio:4/5;min-height:300px}
+
+/* CÔNG NGHỆ LÕI */
+.loi .khoi{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,5vw,64px);align-items:center;padding-block:clamp(36px,6vw,70px)}
+.loi .khoi:nth-child(even) .noidung{order:2}
+@media (max-width:860px){.loi .khoi{grid-template-columns:1fr;gap:26px}.loi .khoi:nth-child(even) .noidung{order:0}}
+.loi .ph{aspect-ratio:4/3;min-height:260px;background:#0e1115}
+.loi h3{font-size:clamp(24px,3.4vw,38px)}
+.loi .noidung p{color:var(--xam-chu);font-size:17px;margin-top:14px;max-width:44ch}
+.loi .thong-so{margin-top:20px;display:inline-flex;flex-direction:column;gap:2px;border-left:3px solid var(--nhan);padding-left:16px}
+.loi .thong-so .v{font-size:clamp(24px,3vw,34px);font-weight:800}
+.loi .thong-so .k{font-size:13px;color:var(--xam-chu)}
+
+/* THÔNG MINH */
+.smart .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:44px}
+@media (max-width:1024px){.smart .cards{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){.smart .cards{grid-template-columns:1fr}}
+.card{background:var(--xam);border:1px solid var(--xam-net);border-radius:16px;padding:26px;transition:transform .3s,box-shadow .3s}
+.card:hover{transform:translateY(-6px);box-shadow:0 18px 40px -22px rgba(10,10,10,.4)}
+.card .ic{width:46px;height:46px;border-radius:12px;background:#fff;border:1px solid var(--xam-net);display:grid;place-items:center;margin-bottom:18px;color:var(--nhan)}
+.card .ic svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.7}
+.card h3{font-size:19px}
+.card p{color:var(--xam-chu);font-size:14.5px;margin-top:8px}
+
+/* VẬT LIỆU */
+.vl .vl-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(30px,5vw,60px);align-items:center}
+@media (max-width:860px){.vl .vl-grid{grid-template-columns:1fr}}
+.vl .ph{aspect-ratio:1/1;min-height:300px;background:#15181d}
+.vl h2{font-size:clamp(28px,4.4vw,52px)}
+.vl .badges{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
+.vl .badge{display:inline-flex;align-items:center;gap:9px;border:1px solid var(--den-net);border-radius:999px;padding:9px 16px;font-size:13.5px;color:var(--den-chu)}
+.vl .badge b{color:#fff;font-weight:600}
+.vl .badge .dot{width:8px;height:8px;border-radius:999px;background:var(--nhan)}
+
+/* VẬN HÀNH */
+.run .run-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:clamp(30px,5vw,56px);align-items:center}
+@media (max-width:900px){.run .run-grid{grid-template-columns:1fr}}
+.run .ph{aspect-ratio:3/4;min-height:320px;background:#0e1115}
+.run .buoc{display:grid;gap:14px;margin-top:30px}
+.run .b{display:flex;gap:18px;align-items:flex-start;padding:18px 0;border-top:1px solid var(--xam-net)}
+.run .b .n{font-size:clamp(28px,4vw,44px);font-weight:800;color:var(--nhan);line-height:1;min-width:1.4em}
+.run .b h3{font-size:19px}
+.run .b p{color:var(--xam-chu);font-size:15px;margin-top:4px}
+
+/* DEMO */
+.demo .ph.video{aspect-ratio:16/9;min-height:280px;margin-top:38px;cursor:pointer}
+.demo .play{position:relative;z-index:2;width:76px;height:76px;border-radius:999px;background:rgba(255,255,255,.14);border:1.5px solid rgba(255,255,255,.5);display:grid;place-items:center;backdrop-filter:blur(4px)}
+.demo .play::after{content:"";border-style:solid;border-width:12px 0 12px 20px;border-color:transparent transparent transparent #fff;margin-left:5px}
+.demo .tms{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:40px}
+@media (max-width:860px){.demo .tms{grid-template-columns:1fr}}
+.tm{background:rgba(255,255,255,.04);border:1px solid var(--den-net);border-radius:16px;padding:24px}
+.tm .q{font-size:17px;color:#fff;font-weight:500}
+.tm .meta{margin-top:16px;color:var(--den-chu);font-size:13.5px}
+.tm .meta b{color:var(--nhan);display:block;font-weight:600;font-size:15px}
+.tm .so{margin-top:12px;font-size:22px;font-weight:800;color:#fff}
+
+/* SO SÁNH */
+.ss .bang{margin-top:40px;border:1px solid var(--xam-net);border-radius:16px;overflow:hidden;overflow-x:auto}
+.ss table{border-collapse:collapse;width:100%;min-width:560px}
+.ss th,.ss td{padding:16px 20px;text-align:left;border-bottom:1px solid var(--xam-net);font-size:15px}
+.ss thead th{font-size:13px;color:var(--xam-chu);font-weight:600;background:var(--xam)}
+.ss thead th.me{color:var(--ink);background:rgba(51,166,220,.1)}
+.ss tbody td:first-child{color:var(--xam-chu)}
+.ss td.me{background:rgba(51,166,220,.06);font-weight:600}
+.ss .tick{color:var(--nhan-dam);font-weight:800}
+.ss .cross{color:#c0c0c6}
+.ss tr:last-child td{border-bottom:0}
+
+/* THÔNG SỐ */
+.spec .spec-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:clamp(30px,5vw,56px);align-items:start}
+@media (max-width:900px){.spec .spec-grid{grid-template-columns:1fr}}
+.spec .ph{aspect-ratio:4/3;min-height:240px;background:var(--xam);border-color:var(--xam-net)}
+.spec .ph .nhan-ph{color:var(--xam-chu)}.spec .ph .nhan-ph b{color:var(--ink)}
+.spec dl{border-top:1px solid var(--xam-net)}
+.spec .row{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:15px 0;border-bottom:1px solid var(--xam-net)}
+.spec .row dt{color:var(--xam-chu);font-size:15px}
+.spec .row dd{font-weight:600;font-size:15px}
+.spec .them{margin-top:18px}
+.spec summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-weight:600;color:var(--nhan-dam);font-size:15px;padding:6px 0}
+.spec summary::-webkit-details-marker{display:none}
+.spec summary::after{content:"+";font-size:18px}
+.spec details[open] summary::after{content:"–"}
+
+/* CTA */
+.cta h2{font-size:clamp(34px,6vw,72px)}
+.cta .cta-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(30px,5vw,60px);align-items:center;margin-top:12px}
+@media (max-width:860px){.cta .cta-grid{grid-template-columns:1fr}}
+.cta form{display:grid;gap:12px;background:rgba(255,255,255,.05);border:1px solid var(--den-net);border-radius:18px;padding:26px}
+.cta input{font:inherit;padding:15px 16px;border-radius:10px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff}
+.cta input::placeholder{color:rgba(255,255,255,.5)}
+.cta .hang-nut{margin-top:4px}
+.cta .bao{display:none;background:var(--nhan);color:#04202f;padding:12px 14px;border-radius:10px;font-size:14px;font-weight:600}
+.cta .lh-phu{color:var(--den-chu);font-size:15px;margin-top:20px}
+.cta .lh-phu b{color:#fff}
+
+/* FOOTER */
+.foot{background:#060708;color:rgba(255,255,255,.55);padding-block:48px 30px;border-top:1px solid var(--den-net)}
+.foot .fg{display:flex;flex-wrap:wrap;gap:18px 40px;align-items:center;justify-content:space-between}
+.foot .lg{font-weight:800;color:#fff;font-size:20px}
+.foot .fl{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:14px}
+.foot .fl b{color:#fff;font-weight:600}
+.foot .bh{margin-top:22px;font-size:12.5px;color:rgba(255,255,255,.35)}
+
+.sticky-bar{position:fixed;left:0;right:0;bottom:0;z-index:60;display:none;gap:10px;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));background:rgba(10,10,10,.92);backdrop-filter:blur(10px);border-top:1px solid var(--den-net)}
+.sticky-bar a{flex:1;text-align:center;padding:14px;border-radius:999px;font-weight:600;font-size:15px}
+.sticky-bar .z{background:var(--nhan);color:#04202f}
+.sticky-bar .g{background:transparent;border:1.5px solid rgba(255,255,255,.4);color:#fff}
+@media (max-width:768px){.sticky-bar{display:flex}.foot{padding-bottom:110px}}
+
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.gsap-on .reveal{opacity:1!important}.cuon::after{animation:none}}
+</style>
+</head>
+<body>
+
+<!-- 1 · HERO -->
+<section class="hero den" id="hero">
+  <div class="ph bg">
+    <video autoplay muted loop playsinline preload="none" poster="/media/vehinh-hero-poster.jpg">
+      <source src="/media/vehinh-hero-loop.mp4" type="video/mp4">
+    </video>
+    <span class="nhan-ph">VIDEO HERO — ROBOT ĐANG VẼ<b>/media/vehinh-hero-loop.mp4</b></span>
+  </div>
+  <div class="wrap">
+    <img class="logo" src="/media/logo-trang.webp" alt="VTEC">
+    <h1 class="reveal">
+      <span class="ten">VTEC CAKEW</span>
+      <span class="tag">Khách gửi hình nào, vẽ hình đó.</span>
+    </h1>
+    <p class="sub reveal">Robot vẽ hình, chân dung, logo và viết chữ lên bánh — điều khiển bằng điện thoại, AI gợi ý bố cục. Nhận mọi đơn bánh khó mà không cần thợ vẽ tay.</p>
+    <div class="hang-nut reveal">
+      <a class="nut nut-chinh" href="#cta">Báo giá qua Zalo</a>
+      <a class="nut nut-phu" href="#demo">Xem máy vẽ thật ▶</a>
+    </div>
+  </div>
+  <div class="cuon" aria-hidden="true">Cuộn xuống</div>
+</section>
+
+<!-- dải số count-up -->
+<section class="so-day" id="so" aria-label="Thông số nổi bật">
+  <div class="so-grid">
+    <div class="so-o"><div class="num"><span class="dem" data-to="500" data-suffix="+">500+</span></div><div class="nhan-so">font &amp; mẫu có sẵn</div></div>
+    <div class="so-o"><div class="num"><span class="dem" data-to="100" data-suffix="%">100%</span></div><div class="nhan-so">giống nhau mỗi lần</div></div>
+    <div class="so-o"><div class="num"><span class="dem" data-to="1">1</span></div><div class="nhan-so">chạm từ điện thoại</div></div>
+  </div>
+</section>
+
+<!-- 2 · NĂNG LỰC -->
+<section class="speed den sec" id="speed">
+  <div class="wrap"><div class="speed-grid">
+    <div>
+      <p class="eyebrow">Vẽ được mọi hình</p>
+      <h2 class="big">Hết cảnh<br>từ chối đơn khó.</h2>
+      <div class="huge" aria-hidden="true">500<span>+</span></div>
+      <div class="moc">
+        <div class="m"><b>Vẽ tay</b> phụ thuộc tay nghề, hình khó là phải chối.</div>
+        <div class="m"><b>VTEC CAKEW</b> kho 500+ font &amp; mẫu, AI gợi ý bố cục — vẽ được hình khách gửi.</div>
+      </div>
+      <span class="vs">Khách gửi ảnh qua Zalo → có ngay bản vẽ lên bánh.</span>
+    </div>
+    <div class="ph">
+      <video autoplay muted loop playsinline preload="none" poster="/media/ve-poster.jpg">
+        <source src="/media/may-dang-ve.mp4" type="video/mp4">
+      </video>
+      <span class="nhan-ph">VIDEO ROBOT ĐANG VẼ<b>/media/may-dang-ve.mp4</b></span>
+    </div>
+  </div></div>
+</section>
+
+<!-- 3 · CÔNG NGHỆ LÕI -->
+<section class="loi sec" id="loi">
+  <div class="wrap">
+    <p class="eyebrow reveal">Công nghệ lõi</p>
+    <h2 class="big reveal" style="max-width:17ch">Vì sao nét vẽ đẹp và đều đến vậy.</h2>
+
+    <div class="khoi">
+      <div class="ph reveal"><img src="/media/cat-dau-ve.jpg" alt="Đầu vẽ nhiều trục" loading="lazy" decoding="async"><span class="nhan-ph">ẢNH CẬN CẢNH ĐẦU VẼ<b>/media/cat-dau-ve.jpg</b></span></div>
+      <div class="noidung reveal">
+        <h3>Đầu vẽ chính xác nhiều trục</h3>
+        <p>Cơ cấu điều khiển chính xác từng điểm, đặt nét đúng chỗ. Vẽ lại một mẫu hàng trăm lần vẫn giống hệt nhau — không run tay, không lệch.</p>
+        <div class="thong-so"><span class="v">100%</span><span class="k">vẽ lại chính xác</span></div>
+      </div>
+    </div>
+
+    <div class="khoi">
+      <div class="ph reveal"><img src="/media/net-dam-nhat.jpg" alt="Nét đậm nhạt như viết tay" loading="lazy" decoding="async"><span class="nhan-ph">ẢNH NÉT CHỮ ĐẬM – NHẠT<b>/media/net-dam-nhat.jpg</b></span></div>
+      <div class="noidung reveal">
+        <h3>Nét đậm – nhạt như viết tay</h3>
+        <p>Chữ có nét thanh nét đậm, mềm mại như nghệ nhân viết, không khô cứng kiểu máy. Hơn 500 font chữ Việt, kho mẫu theo từng dịp lễ.</p>
+        <div class="thong-so"><span class="v">500+</span><span class="k">font chữ Việt</span></div>
+      </div>
+    </div>
+
+    <div class="khoi">
+      <div class="ph reveal"><img src="/media/xilanh-10ml.jpg" alt="Xilanh 10ml thay nhanh" loading="lazy" decoding="async"><span class="nhan-ph">ẢNH XILANH 10ML<b>/media/xilanh-10ml.jpg</b></span></div>
+      <div class="noidung reveal">
+        <h3>Xilanh 10ml, đổi màu nhanh</h3>
+        <p>Dùng socola, kem hay mực ăn được — tháo thay xilanh trong vài giây để đổi màu. Linh hoạt cho bánh nhiều chi tiết, nhiều sắc.</p>
+        <div class="thong-so"><span class="v">10&nbsp;ml</span><span class="k">xilanh thay nhanh</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4 · THÔNG MINH -->
+<section class="smart sec" style="background:var(--xam)" id="smart">
+  <div class="wrap">
+    <p class="eyebrow reveal">Tự động &amp; thông minh</p>
+    <h2 class="big reveal" style="max-width:15ch">Thông minh, làm thay cả thợ thiết kế.</h2>
+    <div class="cards">
+      <div class="card reveal">
+        <div class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 7h6M9 11h6M9 15h3"/></svg></div>
+        <h3>Điều khiển bằng điện thoại</h3>
+        <p>Kết nối WiFi, ra lệnh ngay trên app — không cần máy tính, đứng đâu cũng chạy.</p>
+      </div>
+      <div class="card reveal">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M5 12H2M22 12h-3"/><circle cx="12" cy="12" r="4"/></svg></div>
+        <h3>AI gợi ý bố cục</h3>
+        <p>AI tự căn chữ, căn hình cân đối lên mặt bánh và gợi ý nội dung theo dịp.</p>
+      </div>
+      <div class="card reveal">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/><circle cx="18" cy="17" r="2"/></svg></div>
+        <h3>Kho 500+ font &amp; mẫu</h3>
+        <p>Thư viện font chữ Việt và mẫu hình sẵn — chọn một chạm, cập nhật qua mạng.</p>
+      </div>
+      <div class="card reveal">
+        <div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="7" height="7" rx="1.5"/><rect x="14" y="4" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="6" rx="1.5"/><rect x="14" y="14" width="7" height="6" rx="1.5"/></svg></div>
+        <h3>Quản lý nhiều máy</h3>
+        <p>Nhiều máy, nhiều chi nhánh trên một tài khoản — đồng bộ mẫu, đồng đều chất lượng.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 · VẬT LIỆU & AN TOÀN -->
+<section class="vl den sec" id="vatlieu">
+  <div class="wrap"><div class="vl-grid">
+    <div class="ph reveal"><img src="/media/ve-tren-banh.jpg" alt="Vẽ trên nhiều loại bánh" loading="lazy" decoding="async"><span class="nhan-ph">ẢNH VẼ TRÊN KEM / FONDANT / MACARON<b>/media/ve-tren-banh.jpg</b></span></div>
+    <div class="reveal">
+      <p class="eyebrow">Vật liệu &amp; an toàn</p>
+      <h2>Mực ăn được.<br>Vẽ trên mọi nền bánh.</h2>
+      <p class="lead">Vẽ được bằng socola, kem và mực thực phẩm an toàn — lên bánh kem, fondant, macaron, cookie. Màu chuẩn, bám đẹp, ăn được trọn vẹn.</p>
+      <div class="badges">
+        <span class="badge"><span class="dot"></span><b>Mực ăn được</b></span>
+        <span class="badge"><span class="dot"></span><b>Socola / kem</b></span>
+        <span class="badge"><span class="dot"></span><b>Kem · fondant · macaron</b></span>
+      </div>
+    </div>
+  </div></div>
+</section>
+
+<!-- 6 · VẬN HÀNH -->
+<section class="run sec" id="vanhanh">
+  <div class="wrap"><div class="run-grid">
+    <div class="ph reveal"><img src="/media/app-mockup.png" alt="App điều khiển" loading="lazy" decoding="async"><span class="nhan-ph">MOCKUP APP ĐIỀU KHIỂN<b>/media/app-mockup.png</b></span></div>
+    <div>
+      <p class="eyebrow reveal">Trải nghiệm vận hành</p>
+      <h2 class="big reveal" style="max-width:15ch">Ba bước. Ai cũng vẽ được.</h2>
+      <div class="buoc">
+        <div class="b reveal"><div class="n">1</div><div><h3>Chọn mẫu / nhập chữ</h3><p>Trên điện thoại — AI gợi ý bố cục, chọn font.</p></div></div>
+        <div class="b reveal"><div class="n">2</div><div><h3>Căn lên bánh</h3><p>Xem trước vị trí hình/chữ ngay trên màn hình.</p></div></div>
+        <div class="b reveal"><div class="n">3</div><div><h3>Bấm vẽ</h3><p>Robot vẽ đều, đẹp — lặp lại chính xác hàng loạt.</p></div></div>
+      </div>
+    </div>
+  </div></div>
+</section>
+
+<!-- 7 · DEMO + TESTIMONIAL -->
+<section class="demo den sec" id="demo">
+  <div class="wrap">
+    <p class="eyebrow reveal">Xem máy vẽ thật</p>
+    <h2 class="big reveal" style="max-width:18ch">Không nói nhiều. Xem máy vẽ.</h2>
+    <div class="ph video reveal" id="demoVid">
+      <video muted loop playsinline preload="none" poster="/media/demo-ve-poster.jpg">
+        <source src="/media/demo-ve-full.mp4" type="video/mp4">
+      </video>
+      <div class="play" aria-hidden="true"></div>
+      <span class="nhan-ph" style="position:absolute;bottom:14px;left:14px;z-index:2">VIDEO DEMO DÀI<b>/media/demo-ve-full.mp4</b></span>
+    </div>
+    <div class="tms">
+      <div class="tm reveal"><div class="q">"Giờ đơn vẽ chân dung tôi nhận hết."</div><div class="meta"><b>Tiệm bánh [CẦN BỔ SUNG]</b>Quận 7, TP.HCM</div><div class="so">+30% đơn đặc biệt</div></div>
+      <div class="tm reveal"><div class="q">"Chữ đẹp đều, khách khó tính cũng ưng."</div><div class="meta"><b>Tiệm bánh [CẦN BỔ SUNG]</b>Biên Hoà, Đồng Nai</div><div class="so">80 bánh chữ/ngày</div></div>
+      <div class="tm reveal"><div class="q">"Không cần thuê thợ vẽ, đỡ hẳn chi phí."</div><div class="meta"><b>Tiệm bánh [CẦN BỔ SUNG]</b>Thủ Đức, TP.HCM</div><div class="so">2 chi nhánh</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 8 · SO SÁNH -->
+<section class="ss sec" id="sosanh">
+  <div class="wrap">
+    <p class="eyebrow reveal">So sánh</p>
+    <h2 class="big reveal" style="max-width:16ch">Vẽ tay, máy nhập, hay VTEC CAKEW.</h2>
+    <div class="bang reveal"><table>
+      <thead><tr><th>Tiêu chí</th><th>Vẽ tay</th><th>Máy nhập</th><th class="me">VTEC CAKEW</th></tr></thead>
+      <tbody>
+        <tr><td>Vẽ hình / chân dung / logo</td><td><span class="cross">✕</span> khó &amp; chậm</td><td class="tick">✓</td><td class="me tick">✓</td></tr>
+        <tr><td>Nét đậm – nhạt như tay</td><td class="tick">✓ nếu thợ giỏi</td><td><span class="cross">✕</span></td><td class="me tick">✓</td></tr>
+        <tr><td>Font chữ Việt</td><td>—</td><td><span class="cross">✕</span> ít font</td><td class="me tick">✓ 500+</td></tr>
+        <tr><td>Điều khiển bằng điện thoại</td><td>—</td><td><span class="cross">✕</span></td><td class="me tick">✓ WiFi</td></tr>
+        <tr><td>Vẽ lại chính xác hàng loạt</td><td><span class="cross">✕</span> mỏi tay, lệch</td><td class="tick">✓</td><td class="me tick">✓ 100%</td></tr>
+        <tr><td>Bảo hành &amp; hỗ trợ trong nước</td><td>—</td><td><span class="cross">✕</span> chờ hàng nhập</td><td class="me tick">✓ 12 tháng</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<!-- 9 · THÔNG SỐ -->
+<section class="spec sec" style="background:var(--xam)" id="thongso">
+  <div class="wrap"><div class="spec-grid">
+    <div class="ph reveal"><img src="/media/cakew-thong-so.jpg" alt="Robot VTEC CAKEW" loading="lazy" decoding="async"><span class="nhan-ph">ẢNH MÁY NỀN TRẮNG<b>/media/cakew-thong-so.jpg</b></span></div>
+    <div class="reveal">
+      <p class="eyebrow">Thông số &amp; phiên bản</p>
+      <h2 class="big" style="font-size:clamp(28px,4vw,46px)">VTEC CAKEW</h2>
+      <dl>
+        <div class="row"><dt>CAKEW1 — Vẽ hình</dt><dd>17.500.000đ</dd></div>
+        <div class="row"><dt>CAKEW2 — Chuyên viết chữ</dt><dd>25.000.000đ</dd></div>
+        <div class="row"><dt>Công dụng</dt><dd>Vẽ hình + viết chữ</dd></div>
+        <div class="row"><dt>Kết nối</dt><dd>WiFi — điều khiển điện thoại</dd></div>
+        <div class="row"><dt>Bảo hành</dt><dd>12 tháng</dd></div>
+      </dl>
+      <details class="them">
+        <summary>Xem đầy đủ</summary>
+        <dl>
+          <div class="row"><dt>Vật liệu vẽ</dt><dd>Socola, kem, mực ăn được</dd></div>
+          <div class="row"><dt>Font chữ</dt><dd>500+ (chữ Việt)</dd></div>
+          <div class="row"><dt>Xilanh</dt><dd>10 ml, thay nhanh</dd></div>
+          <div class="row"><dt>Nền vẽ</dt><dd>Kem, fondant, macaron, cookie</dd></div>
+          <div class="row"><dt>Điện áp</dt><dd>220V / 50Hz [CẦN BỔ SUNG]</dd></div>
+          <div class="row"><dt>Kích thước / trọng lượng</dt><dd>[CẦN BỔ SUNG]</dd></div>
+          <div class="row"><dt>Đường kính bánh tối đa</dt><dd>[CẦN BỔ SUNG] cm</dd></div>
+        </dl>
+      </details>
+    </div>
+  </div></div>
+</section>
+
+<!-- 10 · CTA -->
+<section class="cta den sec" id="cta">
+  <div class="wrap"><div class="cta-grid">
+    <div class="reveal">
+      <p class="eyebrow">Sẵn sàng?</p>
+      <h2>Nhận mọi đơn bánh khó.</h2>
+      <p class="lead">Để lại thông tin — VTEC gọi lại tư vấn và báo giá trong ngày làm việc. Hoặc nhắn Zalo / gọi hotline ngay.</p>
+      <p class="lh-phu">Hotline <b>0372 19 39 68</b> · Zalo OA VTEC · vtecvn01@gmail.com</p>
+    </div>
+    <form id="formCTA">
+      <input id="c-ten" name="ten" placeholder="Tên của bạn" autocomplete="name" required>
+      <input id="c-sdt" name="sdt" placeholder="Số điện thoại / Zalo" type="tel" inputmode="tel" autocomplete="tel" required>
+      <input id="c-tinh" name="tinh" placeholder="Tỉnh / Thành phố" autocomplete="address-level1">
+      <div class="hang-nut">
+        <button class="nut nut-chinh" type="submit" style="flex:1;justify-content:center">Nhận báo giá</button>
+        <a class="nut nut-phu" href="tel:0372193968" style="justify-content:center">Gọi ngay</a>
+      </div>
+      <div class="bao" id="baoCTA"></div>
+    </form>
+  </div></div>
+</section>
+
+<!-- 11 · FOOTER -->
+<footer class="foot">
+  <div class="wrap">
+    <div class="fg">
+      <div class="lg">VTEC AUTOMATION</div>
+      <div class="fl">
+        <span>Mua hàng <b>0372 19 39 68</b></span>
+        <span>Kỹ thuật <b>0366 696 008</b></span>
+        <span>Zalo OA VTEC</span>
+        <span>Bảo hành <b>12 tháng</b></span>
+      </div>
+    </div>
+    <div class="bh">295 Liên Phường, P. Long Trường, TP. Hồ Chí Minh · vtecvn01@gmail.com · vtecvn.com</div>
+  </div>
+</footer>
+
+<div class="sticky-bar">
+  <a class="z" href="#cta">Báo giá</a>
+  <a class="g" href="tel:0372193968">Gọi ngay</a>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+document.getElementById('formCTA').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const bao = document.getElementById('baoCTA'); bao.style.display = 'block'; bao.textContent = 'Đang gửi…';
+  try {
+    const r = await fetch('/api/lien-he', { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ ten: document.getElementById('c-ten').value, sdt: document.getElementById('c-sdt').value,
+        quanTam: 'Máy vẽ hình VTEC CAKEW · ' + document.getElementById('c-tinh').value, luc: new Date().toISOString() }) });
+    bao.textContent = r.ok ? 'Đã nhận — VTEC sẽ gọi lại trong ngày làm việc.' : 'Gửi chưa được, bạn gọi thẳng 0372 19 39 68 giúp nhé.';
+  } catch { bao.textContent = 'Gửi chưa được, bạn gọi thẳng 0372 19 39 68 giúp nhé.'; }
+});
+
+(() => {
+  const box = document.getElementById('demoVid'); if (!box) return;
+  const v = box.querySelector('video'); const play = box.querySelector('.play');
+  box.addEventListener('click', () => {
+    if (!v) return;
+    if (v.paused) { v.play().catch(()=>{}); if (play) play.style.display='none'; }
+    else { v.pause(); if (play) play.style.display=''; }
+  });
+})();
+
+(() => {
+  const giam = matchMedia('(prefers-reduced-motion:reduce)').matches;
+  if (typeof gsap === 'undefined' || giam) return;
+  document.body.classList.add('gsap-on');
+  if (gsap.registerPlugin && window.ScrollTrigger) gsap.registerPlugin(ScrollTrigger);
+  const E = 'power2.out';
+
+  gsap.utils.toArray('.reveal').forEach((el) => {
+    gsap.fromTo(el, { opacity:0, y:34 }, { opacity:1, y:0, duration:.8, ease:E, scrollTrigger:{ trigger:el, start:'top 86%' } });
+  });
+
+  gsap.utils.toArray('.dem').forEach((el) => {
+    const to = +el.dataset.to || 0; const suf = el.dataset.suffix || '';
+    const obj = { v:0 };
+    ScrollTrigger.create({ trigger:el, start:'top 90%', once:true, onEnter:() => {
+      gsap.to(obj, { v:to, duration:1.2, ease:E, onUpdate:() => { el.textContent = Math.round(obj.v) + suf; } });
+    }});
+  });
+
+  gsap.utils.toArray('.ph:not(.bg) video, .ph:not(.bg) img').forEach((m) => {
+    gsap.fromTo(m, { yPercent:-6 }, { yPercent:6, ease:'none', scrollTrigger:{ trigger:m.closest('.ph'), scrub:true, start:'top bottom', end:'bottom top' } });
+  });
+
+  const mm = gsap.matchMedia();
+  mm.add('(min-width:1024px)', () => {
+    const speed = document.getElementById('speed');
+    if (speed) {
+      const huge = speed.querySelector('.huge');
+      const tl = gsap.timeline({ scrollTrigger:{ trigger:speed, start:'top top', end:'+=90%', scrub:.6, pin:true } });
+      tl.fromTo(huge, { scale:.82, opacity:.35 }, { scale:1, opacity:1, ease:E })
+        .fromTo(speed.querySelectorAll('.moc .m'), { opacity:0, x:24 }, { opacity:1, x:0, stagger:.4, ease:E }, '<.2');
+    }
+    const loi = document.getElementById('loi');
+    if (loi) gsap.utils.toArray('#loi .khoi').forEach((k) => {
+      gsap.fromTo(k.querySelector('.ph'), { scale:.94, opacity:.4 }, { scale:1, opacity:1, duration:.9, ease:E, scrollTrigger:{ trigger:k, start:'top 80%' } });
+    });
+  });
+
+  ScrollTrigger.refresh();
+})();
+</script>
+</body>
+</html>
