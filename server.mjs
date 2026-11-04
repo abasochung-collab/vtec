@@ -126,6 +126,20 @@ http.createServer(async (req, res) => {
         res.writeHead(200); return res.end("ok");
       }
     }
+    // Vị trí hiển thị (object-position) của ảnh/poster trong /1, /2 — GET công khai để trang áp, POST cần đăng nhập
+    if (u.pathname === "/api/vitri") {
+      if (req.method === "GET") {
+        res.writeHead(200, { "Content-Type": MIME.json });
+        return res.end(existsSync(path.join(DL, "vitri.json")) ? readFileSync(path.join(DL, "vitri.json")) : "{}");
+      }
+      if (!coPhien) return tu401();
+      if (req.method === "POST") {
+        const than = await docThan(req, 256 * 1024);
+        const o = JSON.parse(than.toString()); // phải là JSON hợp lệ
+        writeFileSync(path.join(DL, "vitri.json"), JSON.stringify(o));
+        res.writeHead(200); return res.end("ok");
+      }
+    }
     if (req.method === "POST" && u.pathname === "/api/tep") {
       if (!coPhien) return tu401();
       const goc = (u.searchParams.get("ten") || "tep").replace(/[^\w.\-]+/g, "-").slice(-80);

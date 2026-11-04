@@ -7,86 +7,149 @@
 <meta name="robots" content="noindex">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;line-height:1.5;padding:18px;padding-bottom:60px}
-.wrap{max-width:720px;margin:0 auto}
-h1{font-size:22px;font-weight:800;letter-spacing:-.01em}
-.sub{color:rgba(255,255,255,.6);font-size:14px;margin-top:6px}
-.top{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0 22px}
-.lnk{font-size:13px;color:#33A6DC;text-decoration:none;border:1px solid rgba(51,166,220,.5);padding:7px 13px;border-radius:999px}
-h2{font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:#33A6DC;margin:26px 0 12px;font-weight:700}
-.o{display:flex;gap:14px;align-items:center;background:#141414;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;margin-bottom:10px}
-.xem{width:72px;height:72px;flex:none;border-radius:8px;background:#000;border:1px solid rgba(255,255,255,.12);overflow:hidden;display:grid;place-items:center;position:relative}
-.xem img,.xem video{width:100%;height:100%;object-fit:cover}
+body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;line-height:1.5;padding:16px;padding-bottom:60px}
+.wrap{max-width:860px;margin:0 auto}
+h1{font-size:21px;font-weight:800;letter-spacing:-.01em}
+.sub{color:rgba(255,255,255,.6);font-size:13.5px;margin-top:5px}
+.top{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0 16px}
+.lnk{font-size:13px;color:#33A6DC;text-decoration:none;border:1px solid rgba(51,166,220,.5);padding:7px 13px;border-radius:999px;cursor:pointer;background:none}
+.lnk.on{background:#33A6DC;color:#04202f;border-color:#33A6DC;font-weight:700}
+/* bố cục 2 cột trên màn rộng: trái = danh sách, phải = xem trước dính */
+.main{display:grid;grid-template-columns:1fr;gap:18px}
+@media (min-width:880px){.main{grid-template-columns:1fr 360px}}
+.xp{position:sticky;top:12px}
+.xp .khung{border:1px solid rgba(255,255,255,.14);border-radius:16px;overflow:hidden;background:#000}
+.xp .bar{display:flex;gap:6px;align-items:center;padding:8px 10px;background:#141414;border-bottom:1px solid rgba(255,255,255,.1);font-size:12px;color:rgba(255,255,255,.6)}
+.xp iframe{width:100%;height:560px;border:0;background:#000;display:block}
+.xp .rl{margin-left:auto;cursor:pointer;color:#33A6DC;background:none;border:0;font:inherit;font-size:12px}
+h2{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#33A6DC;margin:22px 0 10px;font-weight:700}
+.o{display:flex;gap:12px;align-items:center;background:#141414;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:11px;margin-bottom:9px}
+.xem{width:66px;height:66px;flex:none;border-radius:8px;background:#000;border:1px solid rgba(255,255,255,.12);overflow:hidden;display:grid;place-items:center;position:relative}
+.xem img{width:100%;height:100%;object-fit:cover}
 .xem .cho{font-size:10px;color:rgba(255,255,255,.4);text-align:center;padding:4px}
 .o .tt{flex:1;min-width:0}
-.o .nhan{font-weight:600;font-size:14.5px}
-.o .ten{font-size:12px;color:rgba(255,255,255,.5);font-family:ui-monospace,monospace;word-break:break-all}
-.o .tr{font-size:12px;margin-top:3px}
+.o .nhan{font-weight:600;font-size:14px}
+.o .ten{font-size:11.5px;color:rgba(255,255,255,.5);font-family:ui-monospace,monospace;word-break:break-all}
+.o .tr{font-size:11.5px;margin-top:3px}
 .o .tr.co{color:#4ade80}.o .tr.khong{color:rgba(255,255,255,.4)}.o .tr.loi{color:#f87171}
-.nut{flex:none;background:#33A6DC;color:#04202f;border:0;border-radius:999px;padding:10px 15px;font:inherit;font-weight:700;font-size:13px;cursor:pointer}
+.acts{display:flex;flex-direction:column;gap:6px;flex:none}
+.nut{background:#33A6DC;color:#04202f;border:0;border-radius:999px;padding:9px 14px;font:inherit;font-weight:700;font-size:12.5px;cursor:pointer;white-space:nowrap}
+.nut.ghost{background:rgba(255,255,255,.1);color:#fff}
 .nut:disabled{opacity:.6}
 .badge{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);background:rgba(255,255,255,.07);padding:3px 7px;border-radius:5px;margin-left:6px}
-.ghi{font-size:12.5px;color:rgba(255,255,255,.5);background:rgba(51,166,220,.08);border:1px dashed rgba(51,166,220,.3);border-radius:10px;padding:11px 13px;margin-bottom:8px}
+.ghi{font-size:12px;color:rgba(255,255,255,.5);background:rgba(51,166,220,.08);border:1px dashed rgba(51,166,220,.3);border-radius:10px;padding:10px 12px;margin-bottom:10px}
+
+/* modal chỉnh vị trí */
+.modal{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.82);display:none;place-items:center;padding:16px}
+.modal.hien{display:grid}
+.mbox{background:#141414;border:1px solid rgba(255,255,255,.14);border-radius:16px;max-width:460px;width:100%;padding:18px}
+.mbox h3{font-size:16px;font-weight:700}
+.mbox .md{font-size:12.5px;color:rgba(255,255,255,.6);margin:4px 0 14px}
+.crop{position:relative;width:100%;background:#000;border:1px solid rgba(255,255,255,.14);border-radius:10px;overflow:hidden;touch-action:none;cursor:grab;user-select:none}
+.crop.drag{cursor:grabbing}
+.crop img{width:100%;height:100%;object-fit:cover;pointer-events:none}
+.crop .dot{position:absolute;width:26px;height:26px;border:2px solid #fff;border-radius:999px;transform:translate(-50%,-50%);box-shadow:0 0 0 2px rgba(0,0,0,.5);pointer-events:none}
+.crop .dot::after{content:"";position:absolute;inset:9px;background:#33A6DC;border-radius:999px}
+.crop .gl{position:absolute;inset:0;pointer-events:none;background:
+  linear-gradient(rgba(255,255,255,.14) 1px,transparent 1px) 0 33.33%/100% 33.33%,
+  linear-gradient(90deg,rgba(255,255,255,.14) 1px,transparent 1px) 33.33% 0/33.33% 100%}
+.mbox .mrow{display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap}
+.mbox .val{font-size:12px;color:rgba(255,255,255,.55);font-family:ui-monospace,monospace}
+.mbox .mnut{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.mbox .mnut .nut{padding:11px 16px;font-size:13px}
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>Quản lý media — trang /1 &amp; /2</h1>
-  <p class="sub">Bấm <b>Tải lên</b> ở mỗi ô để thay ảnh/video. Tệp lên ngay, khách mở trang là thấy — không cần deploy lại.</p>
+  <p class="sub">Tải ảnh/video từ điện thoại, và <b>kéo để chọn vùng hiển thị</b>. Đổi là thấy ngay — không cần deploy.</p>
   <div class="top">
-    <a class="lnk" href="/1" target="_blank">Mở trang /1 ↗</a>
-    <a class="lnk" href="/2" target="_blank">Mở trang /2 ↗</a>
-    <a class="lnk" href="/cai-dat">← Về cài đặt</a>
+    <span style="font-size:13px;color:rgba(255,255,255,.6)">Xem trước:</span>
+    <button class="lnk on" data-xp="/2">Trang /2</button>
+    <button class="lnk" data-xp="/1">Trang /1</button>
+    <a class="lnk" href="/cai-dat" style="margin-left:auto">← Về cài đặt</a>
   </div>
-  <p class="ghi">Ảnh nên nén trước (JPG/WebP/PNG). Video MP4, khuyến nghị dưới ~50MB cho tải nhanh (tối đa 200MB). Video hero nên <b>loop liền mạch, không tiếng</b>.</p>
-  <div id="ds"></div>
+  <p class="ghi">Ảnh nén trước (JPG/WebP/PNG). Video MP4 nên dưới ~50MB (tối đa 200MB), hero <b>loop liền mạch, không tiếng</b>. Nút <b>Vị trí</b> để kéo chọn phần ảnh hiện ra trong khung.</p>
+
+  <div class="main">
+    <div id="ds"></div>
+    <div class="xp">
+      <div class="khung">
+        <div class="bar">Xem trước trực tiếp <button class="rl" id="rl">⟳ Tải lại</button></div>
+        <iframe id="xframe" src="/2" title="Xem trước"></iframe>
+      </div>
+      <p class="sub" style="margin-top:8px;text-align:center">Cuộn trong khung để xem cả trang.</p>
+    </div>
+  </div>
 </div>
 
 <input type="file" id="chon" hidden>
 
+<!-- modal chỉnh vị trí -->
+<div class="modal" id="modal">
+  <div class="mbox">
+    <h3 id="m-nhan">Vị trí ảnh</h3>
+    <p class="md">Kéo trong khung để chọn phần ảnh hiển thị. Khung mô phỏng đúng tỉ lệ chỗ ảnh xuất hiện trên trang.</p>
+    <div class="crop" id="crop"><img id="m-img" alt=""><div class="gl"></div><div class="dot" id="m-dot"></div></div>
+    <div class="mrow"><span class="val" id="m-val">object-position: 50% 50%</span></div>
+    <div class="mnut">
+      <button class="nut" id="m-luu">Lưu vị trí</button>
+      <button class="nut ghost" id="m-giua">Đặt lại giữa</button>
+      <button class="nut ghost" id="m-dong">Đóng</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const SLOTS = {
-  "Trang /1 — Máy chà láng VTEC 3.1": [
-    ["hero-chalang-loop.mp4","Video hero (máy chạy)","video"],
-    ["hero-poster.jpg","Ảnh poster hero","image"],
-    ["may-dang-cha.mp4","Video cận cảnh chà","video"],
-    ["cha-poster.jpg","Poster video chà","image"],
-    ["cat-dau-cha.jpg","Ảnh mặt cắt đầu chà","image"],
-    ["can-canh-chinh-day.jpg","Ảnh chỉnh độ dày","image"],
-    ["de-xoay.jpg","Ảnh đế căn tâm","image"],
-    ["inox-304-canclose.jpg","Ảnh chi tiết inox","image"],
-    ["hmi-mockup.png","Mockup màn hình HMI","image"],
-    ["demo-full.mp4","Video demo dài","video"],
-    ["demo-poster.jpg","Poster video demo","image"],
-    ["may-thong-so.jpg","Ảnh máy nền trắng","image"]
-  ],
   "Trang /2 — Máy vẽ hình VTEC CAKEW": [
-    ["vehinh-hero-loop.mp4","Video hero (robot vẽ)","video"],
-    ["vehinh-hero-poster.jpg","Ảnh poster hero","image"],
-    ["may-dang-ve.mp4","Video cận cảnh vẽ","video"],
-    ["ve-poster.jpg","Poster video vẽ","image"],
-    ["cat-dau-ve.jpg","Ảnh đầu vẽ","image"],
-    ["net-dam-nhat.jpg","Ảnh nét đậm–nhạt","image"],
-    ["xilanh-10ml.jpg","Ảnh xilanh 10ml","image"],
-    ["app-mockup.png","Mockup app điều khiển","image"],
-    ["ve-tren-banh.jpg","Ảnh vẽ trên bánh","image"],
-    ["demo-ve-full.mp4","Video demo dài","video"],
-    ["demo-ve-poster.jpg","Poster video demo","image"],
-    ["cakew-thong-so.jpg","Ảnh máy nền trắng","image"]
+    ["vehinh-hero-loop.mp4","Video hero (robot vẽ)","video","16/9"],
+    ["vehinh-hero-poster.jpg","Ảnh poster hero","image","16/9"],
+    ["may-dang-ve.mp4","Video cận cảnh vẽ","video","4/5"],
+    ["ve-poster.jpg","Poster video vẽ","image","4/5"],
+    ["cat-dau-ve.jpg","Ảnh đầu vẽ","image","4/3"],
+    ["net-dam-nhat.jpg","Ảnh nét đậm–nhạt","image","4/3"],
+    ["xilanh-10ml.jpg","Ảnh xilanh 10ml","image","4/3"],
+    ["app-mockup.png","Mockup app điều khiển","image","3/4"],
+    ["ve-tren-banh.jpg","Ảnh vẽ trên bánh","image","1/1"],
+    ["demo-ve-full.mp4","Video demo dài","video","16/9"],
+    ["demo-ve-poster.jpg","Poster video demo","image","16/9"],
+    ["cakew-thong-so.jpg","Ảnh máy nền trắng","image","4/3"]
+  ],
+  "Trang /1 — Máy chà láng VTEC 3.1": [
+    ["hero-chalang-loop.mp4","Video hero (máy chạy)","video","16/9"],
+    ["hero-poster.jpg","Ảnh poster hero","image","16/9"],
+    ["may-dang-cha.mp4","Video cận cảnh chà","video","4/5"],
+    ["cha-poster.jpg","Poster video chà","image","4/5"],
+    ["cat-dau-cha.jpg","Ảnh mặt cắt đầu chà","image","4/3"],
+    ["can-canh-chinh-day.jpg","Ảnh chỉnh độ dày","image","4/3"],
+    ["de-xoay.jpg","Ảnh đế căn tâm","image","4/3"],
+    ["inox-304-canclose.jpg","Ảnh chi tiết inox","image","1/1"],
+    ["hmi-mockup.png","Mockup màn hình HMI","image","3/4"],
+    ["demo-full.mp4","Video demo dài","video","16/9"],
+    ["demo-poster.jpg","Poster video demo","image","16/9"],
+    ["may-thong-so.jpg","Ảnh máy nền trắng","image","4/3"]
   ]
 };
 
-const chon = document.getElementById('chon');
+let POS = {};   // object-position đã lưu theo tên tệp
 const ds = document.getElementById('ds');
+const chon = document.getElementById('chon');
+const xframe = document.getElementById('xframe');
 
-function card(ten, nhan, loai) {
+async function taiPOS(){ try{ const r=await fetch('/api/vitri'); if(r.ok) POS=await r.json()||{}; }catch(e){} }
+function lamTuoiXem(){ xframe.src = xframe.src.split('?')[0] + '?t=' + Date.now(); }
+
+function card(ten, nhan, loai, aspect) {
   const o = document.createElement('div'); o.className = 'o';
-  const bust = '?t=' + Date.now();
   o.innerHTML =
     '<div class="xem" id="xem-'+ten+'"><span class="cho">đang kiểm…</span></div>' +
     '<div class="tt"><div class="nhan">'+nhan+'<span class="badge">'+loai+'</span></div>' +
     '<div class="ten">'+ten+'</div><div class="tr khong" id="tr-'+ten+'">—</div></div>' +
-    '<button class="nut" data-ten="'+ten+'" data-loai="'+loai+'">Tải lên</button>';
+    '<div class="acts">' +
+      '<button class="nut" data-up="'+ten+'" data-loai="'+loai+'">Tải lên</button>' +
+      (loai==='image' ? '<button class="nut ghost" data-pos="'+ten+'" data-aspect="'+aspect+'" data-nhan="'+nhan+'">Vị trí</button>' : '') +
+    '</div>';
   ds.appendChild(o);
   kiemTra(ten, loai);
 }
@@ -97,48 +160,96 @@ function kiemTra(ten, loai) {
   const url = '/media/'+ten+'?t='+Date.now();
   if (loai === 'image') {
     const im = new Image();
-    im.onload = () => { xem.innerHTML=''; im.style.cssText='width:100%;height:100%;object-fit:cover'; xem.appendChild(im); tr.textContent='Đã có'; tr.className='tr co'; };
-    im.onerror = () => { xem.innerHTML='<span class="cho">chưa có</span>'; tr.textContent='Chưa có — dùng placeholder'; tr.className='tr khong'; };
+    im.onload = () => { xem.innerHTML=''; xem.appendChild(im); tr.textContent='Đã có'; tr.className='tr co'; };
+    im.onerror = () => { xem.innerHTML='<span class="cho">chưa có</span>'; tr.textContent='Chưa có — placeholder'; tr.className='tr khong'; };
     im.src = url;
   } else {
     fetch(url, { method:'HEAD' }).then(r => {
       if (r.ok) { xem.innerHTML='<span class="cho" style="color:#4ade80">▶ video</span>'; tr.textContent='Đã có'; tr.className='tr co'; }
-      else { xem.innerHTML='<span class="cho">chưa có</span>'; tr.textContent='Chưa có — ô video để trống'; tr.className='tr khong'; }
-    }).catch(()=>{ xem.innerHTML='<span class="cho">chưa có</span>'; tr.textContent='Chưa có'; tr.className='tr khong'; });
+      else { xem.innerHTML='<span class="cho">chưa có</span>'; tr.textContent='Chưa có'; tr.className='tr khong'; }
+    }).catch(()=>{ xem.innerHTML='<span class="cho">chưa có</span>'; tr.textContent='—'; tr.className='tr khong'; });
   }
 }
 
-for (const [nhom, slots] of Object.entries(SLOTS)) {
-  const h = document.createElement('h2'); h.textContent = nhom; ds.appendChild(h);
-  slots.forEach(([ten, nhan, loai]) => card(ten, nhan, loai));
+function render(){
+  ds.innerHTML='';
+  for (const [nhom, slots] of Object.entries(SLOTS)) {
+    const h = document.createElement('h2'); h.textContent = nhom; ds.appendChild(h);
+    slots.forEach(([ten, nhan, loai, aspect]) => card(ten, nhan, loai, aspect));
+  }
 }
 
-let dangTen = null, dangNut = null, dangLoai = null;
+/* ---- tải lên ---- */
+let upTen=null, upNut=null, upLoai=null;
 ds.addEventListener('click', (e) => {
-  const b = e.target.closest('.nut'); if (!b) return;
-  dangTen = b.dataset.ten; dangNut = b; dangLoai = b.dataset.loai;
-  chon.accept = dangLoai === 'video' ? 'video/*' : 'image/*';
-  chon.value = ''; chon.click();
+  const up = e.target.closest('[data-up]');
+  if (up) { upTen=up.dataset.up; upNut=up; upLoai=up.dataset.loai;
+    chon.accept = upLoai==='video' ? 'video/*' : 'image/*'; chon.value=''; chon.click(); return; }
+  const po = e.target.closest('[data-pos]');
+  if (po) { moModal(po.dataset.pos, po.dataset.aspect, po.dataset.nhan); }
 });
-
 chon.addEventListener('change', async () => {
-  const f = chon.files[0]; if (!f || !dangTen) return;
+  const f = chon.files[0]; if (!f || !upTen) return;
   if (f.size > 200*1024*1024) { alert('Tệp quá 200MB, nén lại giúp nhé'); return; }
-  const tr = document.getElementById('tr-'+dangTen);
-  const nut = dangNut, ten = dangTen, loai = dangLoai;
-  nut.disabled = true; nut.textContent = 'Đang tải…';
-  tr.textContent = 'Đang tải lên…'; tr.className = 'tr';
+  const tr = document.getElementById('tr-'+upTen), nut=upNut, ten=upTen, loai=upLoai;
+  nut.disabled=true; nut.textContent='Đang tải…'; tr.textContent='Đang tải lên…'; tr.className='tr';
   try {
-    const r = await fetch('/api/tep-ten?ten='+encodeURIComponent(ten), { method:'POST', headers:{'Content-Type': f.type||'application/octet-stream'}, body:f });
+    const r = await fetch('/api/tep-ten?ten='+encodeURIComponent(ten), { method:'POST', headers:{'Content-Type':f.type||'application/octet-stream'}, body:f });
     const t = await r.text(); let kq={}; try{kq=JSON.parse(t);}catch{}
     if (!r.ok || !kq.ok) throw new Error(kq.loi || t || ('HTTP '+r.status));
-    tr.textContent = 'Đã tải lên ✓'; tr.className = 'tr co';
-    kiemTra(ten, loai);
-  } catch (err) {
-    tr.textContent = 'Lỗi: ' + err.message; tr.className = 'tr loi';
-  }
-  nut.disabled = false; nut.textContent = 'Tải lên';
+    tr.textContent='Đã tải lên ✓'; tr.className='tr co'; kiemTra(ten, loai); lamTuoiXem();
+  } catch (err) { tr.textContent='Lỗi: '+err.message; tr.className='tr loi'; }
+  nut.disabled=false; nut.textContent='Tải lên';
 });
+
+/* ---- modal chỉnh vị trí (kéo chọn vùng hiển thị) ---- */
+const modal=document.getElementById('modal'), crop=document.getElementById('crop'),
+      mImg=document.getElementById('m-img'), mDot=document.getElementById('m-dot'),
+      mVal=document.getElementById('m-val'), mNhan=document.getElementById('m-nhan');
+let curTen=null, curX=50, curY=50;
+
+function datVi(x,y){ curX=Math.max(0,Math.min(100,x)); curY=Math.max(0,Math.min(100,y));
+  mImg.style.objectPosition = curX.toFixed(1)+'% '+curY.toFixed(1)+'%';
+  mDot.style.left=curX+'%'; mDot.style.top=curY+'%';
+  mVal.textContent='object-position: '+curX.toFixed(0)+'% '+curY.toFixed(0)+'%';
+}
+function moModal(ten, aspect, nhan){
+  curTen=ten; mNhan.textContent='Vị trí: '+nhan;
+  crop.style.aspectRatio=aspect.replace('/',' / ');
+  mImg.src='/media/'+ten+'?t='+Date.now();
+  const cur=(POS[ten]||'50% 50%').split(/\s+/);
+  datVi(parseFloat(cur[0])||50, parseFloat(cur[1])||50);
+  modal.classList.add('hien');
+}
+function tuSuKien(ev){ const r=crop.getBoundingClientRect(); const p=ev.touches?ev.touches[0]:ev;
+  datVi((p.clientX-r.left)/r.width*100, (p.clientY-r.top)/r.height*100); }
+let keo=false;
+crop.addEventListener('pointerdown',(e)=>{keo=true;crop.classList.add('drag');crop.setPointerCapture(e.pointerId);tuSuKien(e);});
+crop.addEventListener('pointermove',(e)=>{if(keo)tuSuKien(e);});
+crop.addEventListener('pointerup',()=>{keo=false;crop.classList.remove('drag');});
+crop.addEventListener('pointercancel',()=>{keo=false;crop.classList.remove('drag');});
+document.getElementById('m-giua').onclick=()=>datVi(50,50);
+document.getElementById('m-dong').onclick=()=>modal.classList.remove('hien');
+modal.addEventListener('click',(e)=>{if(e.target===modal)modal.classList.remove('hien');});
+document.getElementById('m-luu').onclick=async()=>{
+  POS[curTen]=curX.toFixed(0)+'% '+curY.toFixed(0)+'%';
+  const b=document.getElementById('m-luu'); b.disabled=true; b.textContent='Đang lưu…';
+  try{
+    const r=await fetch('/api/vitri',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(POS)});
+    if(!r.ok) throw new Error(await r.text());
+    b.textContent='Đã lưu ✓'; lamTuoiXem(); setTimeout(()=>modal.classList.remove('hien'),500);
+  }catch(e){ b.textContent='Lỗi — thử lại'; }
+  setTimeout(()=>{b.disabled=false;b.textContent='Lưu vị trí';},700);
+};
+
+/* ---- xem trước: đổi trang, tải lại ---- */
+document.querySelectorAll('[data-xp]').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('[data-xp]').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); xframe.src=b.dataset.xp+'?t='+Date.now();
+});
+document.getElementById('rl').onclick=lamTuoiXem;
+
+(async ()=>{ await taiPOS(); render(); })();
 </script>
 </body>
 </html>

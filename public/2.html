@@ -464,6 +464,19 @@ h2.big{font-size:clamp(32px,6vw,68px)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script>
+/* áp vị trí hiển thị (object-position) đã lưu từ /cai-dat/media cho ảnh & video */
+(async () => {
+  try {
+    const r = await fetch('/api/vitri'); if (!r.ok) return;
+    const POS = await r.json();
+    document.querySelectorAll('.ph img, .ph video').forEach((el) => {
+      const src = el.tagName === 'VIDEO' ? el.getAttribute('poster') : el.getAttribute('src');
+      if (!src) return;
+      const ten = src.split('/').pop().split('?')[0];
+      if (POS[ten]) el.style.objectPosition = POS[ten];
+    });
+  } catch (e) {}
+})();
 document.getElementById('formCTA').addEventListener('submit', async (e) => {
   e.preventDefault();
   const bao = document.getElementById('baoCTA'); bao.style.display = 'block'; bao.textContent = 'Đang gửi…';
